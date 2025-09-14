@@ -18,7 +18,6 @@ _🗓️2025-09-13_
 - `CONTRIBUTING.md` with clear contribution steps and ideas
 - `SECURITY.md` with responsible disclosure policy
 - `INSTALL.md` with setup instructions for local and online use
-- `USAGE.md` with detailed interface descriptions
 - `ROADMAP.md` outlining completed, planned, and experimental features
 - `ARCHITECTURE.md` describing project structure and logic
 - `CREDITS.md` with contributor roles and design attribution
