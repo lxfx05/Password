@@ -35,7 +35,7 @@ Make sure `Wayland.css` is in the same folder as the HTML files.
 *🌐 Online Preview*
 
 You can also use the hosted version here:
-👉 [password-creator-teal.vercel.app](https://password-creator-teal.vercel.app)
+👉 [password-creator-teal.vercel.app](https://password-seven-pink.vercel.app/)
 
 ---
 
