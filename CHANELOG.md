@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 
 ---
+
+_🗓️2025-09-14_
+
+**💨Devlopped the App**
+
+`Password.apk` was developed, The instructions for install that is available on [HOW_TO_INSTALL.md](https://github.com/lxfx05/Password/blob/main/HOW%20TO%20INSTALL.md)
+
+---
+
 _🗓️2025-09-13_
 
 
