@@ -4,8 +4,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Password Forum</title>
-  <link rel="stylesheet" href="Wayland.css" />
+  <title>Password Generator Forum</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f9f9f9;
+}
+    h1 {
+      text-align: center;
+}
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+}
+    input[type="text"],
+    input[type="number"] {
+      padding: 8px;
+      font-size: 1em;
+}
+    button {
+      padding: 10px;
+      font-size: 1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+}
+    button:hover {
+      background-color: #0056b3;
+}
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #333;
+}
+  </style>
 </head>
 <body>
   <h1>Password Generator Forum</h1>
@@ -27,50 +65,43 @@
 
   <div id="result"></div>
 
-  <script src="Forum.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("passwordForm");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value.trim();
+        const length = parseInt(document.getElementById("length").value);
+        const includeSymbols = document.getElementById("includeSymbols").checked;
+
+        if (username === "" || isNaN(length) || length < 4 || length> 32) {
+          result.innerHTML = "⚠️ Please fill all fields correctly.";
+          return;
+}
+
+        const password = generatePassword(length, includeSymbols);
+        result.innerHTML = `<strong>${username}</strong>, your password is:<br><code>${password}</code>`;
+});
+
+      function generatePassword(length, includeSymbols) {
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
+        let chars = charset;
+        if (includeSymbols) {
+          chars += symbols;
+}
+
+        let password = "";
+        for (let i = 0; i < length; i++) {
+          password += chars.charAt(Math.floor(Math.random() * chars.length));
+}
+
+        return password;
+}
+});
+  </script>
 </body>
 </html>
-```
-
----
-
-*📄 `Forum.js`*
-
-```javascript
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("passwordForm");
-  const resultDiv = document.getElementById("result");
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById("username").value.trim();
-    const length = parseInt(document.getElementById("length").value);
-    const includeSymbols = document.getElementById("includeSymbols").checked;
-
-    if (!username || isNaN(length) || length < 4 || length> 32) {
-      resultDiv.textContent = "Please fill out all fields correctly.";
-      return;
-}
-
-    const password = generatePassword(length, includeSymbols);
-    resultDiv.innerHTML = `<p><strong>${username}</strong>, your password is:</p><code>${password}</code>`;
-});
-
-  function generatePassword(length, includeSymbols) {
-    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numbers = "0123456789";
-    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-    let charset = letters + numbers;
-    if (includeSymbols) charset += symbols;
-
-    let password = "";
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
-}
-
-    return password;
-}
-});
