@@ -3,104 +3,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Forum - Password Defender</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Password Generator Forum</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-      background-color: #f9f9f9;
-}
-    h1 {
-      text-align: center;
-}
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-}
-    input[type="text"],
-    input[type="number"] {
-      padding: 8px;
-      font-size: 1em;
-}
-    button {
-      padding: 10px;
-      font-size: 1em;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-}
-    button:hover {
-      background-color: #0056b3;
-}
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.1em;
-      color: #333;
-}
-  </style>
+  <link rel="stylesheet" href="Wayland.css" />
 </head>
 <body>
-  <h1>Password Generator Forum</h1>
-
-  <form id="passwordForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" required />
-
-    <label for="length">Password Length:</label>
-    <input type="number" id="length" min="4" max="32" required />
-
-    <label>
-      <input type="checkbox" id="includeSymbols" />
-      Include Symbols
-    </label>
-
-    <button type="submit">Generate Password</button>
-  </form>
-
-  <div id="result"></div>
+  <div class="section">
+    <h2>📝 Fill Your Info</h2>
+    <form id="userForm">
+      <input type="text" id="nome" placeholder="First Name" required />
+      <input type="text" id="cognome" placeholder="Last Name" required />
+      <input type="number" id="eta" placeholder="Age" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="prefisso" placeholder="Phone Prefix" required />
+      <input type="text" id="telefono" placeholder="Phone Number" required />
+      <input type="text" id="residenza" placeholder="Residence" required />
+      <input type="text" id="colore" placeholder="Favorite Color" required />
+      <input type="text" id="cibo" placeholder="Favorite Food" required />
+      <button type="submit">Generate Password</button>
+    </form>
+  </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const form = document.getElementById("passwordForm");
-      const result = document.getElementById("result");
+    document.getElementById("userForm").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
+      const userData = {
+        nome: document.getElementById("nome").value.trim(),
+        cognome: document.getElementById("cognome").value.trim(),
+        eta: document.getElementById("eta").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        prefisso: document.getElementById("prefisso").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        residenza: document.getElementById("residenza").value.trim(),
+        colore: document.getElementById("colore").value.trim(),
+        cibo: document.getElementById("cibo").value.trim()
+};
 
-        const username = document.getElementById("username").value.trim();
-        const length = parseInt(document.getElementById("length").value);
-        const includeSymbols = document.getElementById("includeSymbols").checked;
-
-        if (username === "" || isNaN(length) || length < 4 || length> 32) {
-          result.innerHTML = "⚠️ Please fill all fields correctly.";
-          return;
-}
-
-        const password = generatePassword(length, includeSymbols);
-        result.innerHTML = `<strong>${username}</strong>, your password is:<br><code>${password}</code>`;
-});
-
-      function generatePassword(length, includeSymbols) {
-        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
-        let chars = charset;
-        if (includeSymbols) {
-          chars += symbols;
-}
-
-        let password = "";
-        for (let i = 0; i < length; i++) {
-          password += chars.charAt(Math.floor(Math.random() * chars.length));
-}
-
-        return password;
-}
+      localStorage.setItem("userData", JSON.stringify(userData));
+      window.location.href = "Generator.html";
 });
   </script>
 </body>
