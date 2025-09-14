@@ -14,8 +14,8 @@ This document explains how to install and run **Password Creator with Forum** lo
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/lxfx05/Password-creator.git
-cd Password-creator-with-forum
+git clone https://github.com/lxfx05/Password.git
+cd Password
 ```
 
 Alternatively, download the ZIP from GitHub and extract it.
