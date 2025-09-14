@@ -39,7 +39,7 @@ You can also use the hosted version here:
 
 Or
 
-# 📱Download the file [Password.apk](https://github.com/lxfx05/Password/releases/download/App/Password.apk)
+### 📱Download the file [Password.apk](https://github.com/lxfx05/Password/releases/download/App/Password.apk)
 - The instructions are aviable on [HOW TO INSTALL.md](https://github.com/lxfx05/Password/blob/main/HOW%20TO%20INSTALL.md)
 
 - If you have a new idea or find any issues, please fill up the [Request](https://github.com/lxfx05/Password/issues)
