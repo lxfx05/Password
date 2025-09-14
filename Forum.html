@@ -2,241 +2,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Forum - Password Defender</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Wayland.css">
-  <style>
-.modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-}
-
-.modal-content {
-      background: #1e2249;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      color: white;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-}
-
-.modal-content button {
-      margin-top: 15px;
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-}
-
-.modal-content button:hover {
-      background: #ff1a1a;
-}
-
-textarea {
-      width: 100%;
-      height: 80px;
-      resize: none;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: rgba(255,255,255,0.05);
-      color: #fff;
-      backdrop-filter: blur(4px);
-      font-size: 16px;
-      margin-top: 12px;
-}
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Forum</title>
+  <link rel="stylesheet" href="Wayland.css" />
 </head>
-<script>
-async function sendRequest() {
-  const firstName = document.getElementById("nome").value.trim();
-  const lastName = document.getElementById("cognome").value.trim();
-  const request = document.getElementById("richiesta").value.trim();
+<body>
+  <h1>Password Generator Forum</h1>
 
-  if (!firstName ||!lastName || request.length < 5) {
-    alert("Please fill out all fields and write at least a few words.");
-    return;
+  <form id="passwordForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required />
+
+    <label for="length">Password Length:</label>
+    <input type="number" id="length" min="4" max="32" required />
+
+    <label>
+      <input type="checkbox" id="includeSymbols" />
+      Include Symbols
+    </label>
+
+    <button type="submit">Generate Password</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script src="Forum.js"></script>
+</body>
+</html>
+```
+
+---
+
+*📄 `Forum.js`*
+
+```javascript
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("passwordForm");
+  const resultDiv = document.getElementById("result");
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const length = parseInt(document.getElementById("length").value);
+    const includeSymbols = document.getElementById("includeSymbols").checked;
+
+    if (!username || isNaN(length) || length < 4 || length> 32) {
+      resultDiv.textContent = "Please fill out all fields correctly.";
+      return;
 }
 
-  const timestamp = new Date().toLocaleString("en-US", { hour12: false});
-  const content = `[${timestamp}] First Name: ${firstName} | Last Name: ${lastName} | Request: ${request}\n`;
-  const fileName = `requests/request-${Date.now()}.txt`;
-
-  const response = await fetch(`https://api.github.com/repos/lxfx05/Password-creator/contents/${fileName}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": "Bearer YOUR_GITHUB_TOKEN",
-      "Content-Type": "application/json"
-},
-    body: JSON.stringify({
-      message: "New request from form",
-      content: btoa(content)
-})
+    const password = generatePassword(length, includeSymbols);
+    resultDiv.innerHTML = `<p><strong>${username}</strong>, your password is:</p><code>${password}</code>`;
 });
 
-  if (response.ok) {
-    document.getElementById("thankYouBox").style.display = "block";
-    document.getElementById("nome").value = "";
-    document.getElementById("cognome").value = "";
-    document.getElementById("richiesta").value = "";
-} else {
-    const error = await response.json();
-    alert("Error: " + (error.message || "Unable to save the request"));
-}
-}
-</script>
-<body>
+  function generatePassword(length, includeSymbols) {
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
-  <div class="stars"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
+    let charset = letters + numbers;
+    if (includeSymbols) charset += symbols;
 
-  <div class="section" id="formSection">
-    <h2>🧬 Custom Generator</h2>
-    <input type="text" id="nome" placeholder="First Name">
-    <input type="text" id="cognome" placeholder="Last Name">
-    <input type="number" id="eta" placeholder="Age">
-    <input type="email" id="email" placeholder="Email" oninput="validateEmail()">
-
-    <select id="prefisso">
-      <option value="">Phone prefix</option>
-      <option value="+1">🇺🇸 +1 (USA)</option>
-      <option value="+39">🇮🇹 +39 (Italy)</option>
-      <option value="+44">🇬🇧 +44 (UK)</option>
-      <option value="+33">🇫🇷 +33 (France)</option>
-      <option value="+49">🇩🇪 +49 (Germany)</option>
-      <option value="+81">🇯🇵 +81 (Japan)</option>
-      <option value="+61">🇦🇺 +61 (Australia)</option>
-      <option value="+91">🇮🇳 +91 (India)</option>
-      <option value="+86">🇨🇳 +86 (China)</option>
-      <option value="+65">🇸🇬 +65 (Singapore)</option>
-    </select>
-    <input type="tel" id="telefono" placeholder="Phone number">
-
-    <input type="text" id="residenza" placeholder="Place of residence">
-
-    <select id="colore">
-      <option value="">Favorite color</option>
-      <option>🌌 Midnight Blue</option>
-      <option>🔥 Fire Red</option>
-      <option>🌿 Forest Green</option>
-      <option>🌞 Sun Yellow</option>
-      <option>🧊 Ice Blue</option>
-      <option>🌸 Pastel Pink</option>
-      <option>⚡ Electric Purple</option>
-      <option>🪐 Cosmic Gray</option>
-      <option>🧱 Earth Brown</option>
-      <option>🖤 Deep Black</option>
-    </select>
-
-    <select id="cibo">
-      <option value="">Favorite food</option>
-      <option>🍕 Pizza</option>
-      <option>🍣 Sushi</option>
-      <option>🍔 Hamburger</option>
-      <option>🥗 Salad</option>
-      <option>🍝 Pasta</option>
-      <option>🥩 Steak</option>
-      <option>🍜 Ramen</option>
-      <option>🍰 Cake</option>
-      <option>🍇 Fruit</option>
-      <option>🌮 Tacos</option>
-    </select>
-
-    <button id="submitBtn" disabled onclick="validateForm()">Generate Password</button>
-  </div>
-
-  <div class="section" id="loadingSection" style="display:none;">
-    <h2>⏳ Generation is coming...</h2>
-    <p id="loadingText">Password request access...</p>
-  </div>
-
-  <div id="modal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h3>⚠️ Missing required fields</h3>
-      <p id="missingFields"></p>
-      <button onclick="closeModal()">Close</button>
-    </div>
-  </div>
-
-  <script>
-    function validateEmail() {
-      const email = document.getElementById("email").value;
-      const validDomains = [".com", ".it", ".net", ".org", ".edu", ".gov"];
-      const isValid = email.includes("@") && validDomains.some(d => email.endsWith(d));
-      document.getElementById("submitBtn").disabled =!isValid;
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
 }
 
-    function validateForm() {
-      const fields = {
-        nome: "First Name",
-        cognome: "Last Name",
-        eta: "Age",
-        email: "Email",
-        prefisso: "Prefix",
-        telefono: "Phone",
-        residenza: "Residence",
-        colore: "Favorite color",
-        cibo: "Favorite food"
-};
-
-      const missing = [];
-      for (const id in fields) {
-        const value = document.getElementById(id).value.trim();
-        if (!value) missing.push(fields[id]);
+    return password;
 }
-
-      if (missing.length> 0) {
-        document.getElementById("missingFields").textContent = "Please fill in the following fields: " + missing.join(", ");
-        document.getElementById("modal").style.display = "flex";
-} else {
-        startLoading();
-}
-}
-
-    function closeModal() {
-      document.getElementById("modal").style.display = "none";
-}
-
-    function startLoading() {
-      document.getElementById("formSection").style.display = "none";
-      document.getElementById("loadingSection").style.display = "block";
-
-      const steps = [
-        "Password request access, wait...",
-        "Collecting data...",
-        "Final check..."
-      ];
-
-      let i = 0;
-      const interval = setInterval(() => {
-        document.getElementById("loadingText").textContent = steps[i];
-        i++;
-        if (i === steps.length) {
-          clearInterval(interval);
-          redirectToResult();
-}
-}, 700);
-}
-
-    function redirectToResult() {
-      const data = {
-        nome: document.getElementById("nome").value,
-        cognome: document.getElementById("cognome").value,
-        eta: document.getElementById("eta").value,
-        email: document.getElementById("email").value,
-        prefisso⁽¹⁾
+});
