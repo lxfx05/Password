@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 
 ---
+_🗓️2025-09-13_
+
+
+**🧪Fixed**
+`forum.html` added a js sextion for submitting the forum data filled to get the password result 
+
 
 _🗓️2025-09-13_
 
