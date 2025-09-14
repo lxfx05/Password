@@ -3,16 +3,16 @@
 
 This project was made possible thanks to a talented and dedicated team:
 
-- *👨‍💻 Development:* _Luca Finaldi_
+**👨‍💻 Development:** Luca Finaldi
   Led the implementation of core features and overall architecture.
 
-- *📊 Data Analysis:* _Alex Bergamini_
+**📊 Data Analysis:** Alex Bergamini
   Focused on password strength evaluation and algorithm optimization.
 
-- *🎨 UI/UX Management:* _Sara De Franceschi_
+**🎨 UI/UX Management:** Sara De Franceschi
   Designed the user interface and experience, ensuring clarity and usability.
 
-- *🧪 Testing & Deployment:* _Vercel_
+**🧪 Testing & Deployment:** Vercel
   The project was tested and deployed using Vercel, ensuring performance and reliability.
 
 ---
