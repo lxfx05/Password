@@ -13,13 +13,35 @@
     <form id="userForm">
       <input type="text" id="nome" placeholder="First Name" required />
       <input type="text" id="cognome" placeholder="Last Name" required />
-      <input type="number" id="eta" placeholder="Age" required />
+      <input type="number" id="eta" placeholder="Age" min="15" max="65" required />
       <input type="email" id="email" placeholder="Email" required />
-      <input type="text" id="prefisso" placeholder="Phone Prefix" required />
       <input type="text" id="telefono" placeholder="Phone Number" required />
       <input type="text" id="residenza" placeholder="Residence" required />
-      <input type="text" id="colore" placeholder="Favorite Color" required />
-      <input type="text" id="cibo" placeholder="Favorite Food" required />
+
+      <label for="colore">Favorite Color:</label>
+      <select id="colore" required>
+        <option value="">Select a color</option>
+        <option value="Red">Red</option>
+        <option value="Blue">Blue</option>
+        <option value="Green">Green</option>
+        <option value="Yellow">Yellow</option>
+        <option value="Purple">Purple</option>
+        <option value="Black">Black</option>
+        <option value="White">White</option>
+      </select>
+
+      <label for="cibo">Favorite Food:</label>
+      <select id="cibo" required>
+        <option value="">Select a food</option>
+        <option value="Pizza">Pizza</option>
+        <option value="Sushi">Sushi</option>
+        <option value="Pasta">Pasta</option>
+        <option value="Burger">Burger</option>
+        <option value="Salad">Salad</option>
+        <option value="Steak">Steak</option>
+        <option value="Ice Cream">Ice Cream</option>
+      </select>
+
       <button type="submit">Generate Password</button>
     </form>
   </div>
@@ -33,11 +55,10 @@
         cognome: document.getElementById("cognome").value.trim(),
         eta: document.getElementById("eta").value.trim(),
         email: document.getElementById("email").value.trim(),
-        prefisso: document.getElementById("prefisso").value.trim(),
         telefono: document.getElementById("telefono").value.trim(),
         residenza: document.getElementById("residenza").value.trim(),
-        colore: document.getElementById("colore").value.trim(),
-        cibo: document.getElementById("cibo").value.trim()
+        colore: document.getElementById("colore").value,
+        cibo: document.getElementById("cibo").value
 };
 
       localStorage.setItem("userData", JSON.stringify(userData));
