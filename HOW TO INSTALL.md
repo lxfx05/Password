@@ -15,7 +15,7 @@ This guide will help you install and use the **Password Creator** app on your An
 
 ## 📦 Download the APK
 
-1. Visit the [official repository](https://github.com/lxfx05/Password/tree)
+1. Visit the [official repository](https://github.com/lxfx05/Password)
 2. Download the `Password.apk` file from the **Releases** section or directly from the main folder (if available)
 
 ---
