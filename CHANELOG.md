@@ -18,7 +18,7 @@ _🗓️2025-09-13_
 
 
 **🧪Fixed**
-`forum.html` added a js sextion for submitting the forum data filled to get the password result 
+`forum.html` added a js section for submitting the forum data filled to get the password result 
 
 ---
 
