@@ -34,7 +34,7 @@ _🗓️2025-09-13_
 - Hosted preview on Vercel
 - `CONTRIBUTING.md` with clear contribution steps and ideas
 - `SECURITY.md` with responsible disclosure policy
-- `INSTALL.md` with setup instructions for local and online use
+- `HOW TO INSTALL.md` with setup instructions for local and online use
 - `ROADMAP.md` outlining completed, planned, and experimental features
 - `ARCHITECTURE.md` describing project structure and logic
 - `CREDITS.md` with contributor roles and design attribution
