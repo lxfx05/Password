@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,7 +103,6 @@
       <tr><td>Favorite Color</td><td id="rColor"></td></tr>
       <tr><td>Favorite Food</td><td id="rFood"></td></tr>
     </table>
-    <a href="Forum.html"><button style="margin-top: 20px;"> 🎲 Generate new password</button></a>
 
   <div id="emailModal" class="modal" style="display:none;">
     <div class="modal-content">
@@ -120,9 +118,9 @@
       let password = "";
       for (let i = 0; i < 12; i++) {
         password += charset.charAt(Math.floor(Math.random() * charset.length));
-}
+      }
       return password;
-}
+    }
 
     const data = JSON.parse(localStorage.getItem("userData"));
     if (data) {
@@ -135,8 +133,8 @@
       document.getElementById("rColor").textContent = data.colore;
       document.getElementById("rFood").textContent = data.cibo;
       document.getElementById("generatedPassword").textContent = generatePassword();
-}
-    </script>
+    }
+  </script>
 
 </body>
 </html>
