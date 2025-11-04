@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +34,7 @@
     </table>
 
     <canvas id="passwordChart" style="margin-top: 30px;"></canvas>
-
-    
+  </div>
 
   <script>
     function analyze() {
@@ -62,7 +60,7 @@
       document.getElementById("bar").style.width = (score * 33) + "%";
 
       renderChart(score, crackTime.value);
-}
+    }
 
     function estimateCrackTime(score, length) {
       const base = Math.pow(10, score + length / 4);
@@ -74,7 +72,7 @@
       else label = "Years";
 
       return { value: base, label};
-}
+    }
 
     function renderChart(difficulty, timeValue) {
       const ctx = document.getElementById("passwordChart").getContext("2d");
@@ -89,14 +87,14 @@
               label: "Difficulty",
               data: [difficulty],
               backgroundColor: "#00f260"
-},
+            },
             {
               label: "Crack Time (log)",
               data: [Math.log10(timeValue)],
               backgroundColor: "#0575e6"
-}
+            }
           ]
-},
+        },
         options: {
           responsive: true,
           scales: {
@@ -105,12 +103,12 @@
               title: {
                 display: true,
                 text: "Difficulty / Time Scale"
-}
-}
-}
-}
-});
-}
+              }
+            }
+          }
+        }
+      });
+    }
   </script>
 
 </body>
