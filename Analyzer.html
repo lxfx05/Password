@@ -1,224 +1,122 @@
+
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>Analyzer - Password Defender</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="Wayland.css">
-  <style>
-    body {font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color: #eaeef8; background: #0b0c1a; padding: 18px;}
-    .section {background: rgba(255,255,255,0.03); padding: 18px; border-radius: 12px; max-width:900px; margin: 18px auto;}
-    input[type="text"], input[type="number"] {width:100%; padding:10px; border-radius:8px; border:none; background: rgba(255,255,255,0.04); color:inherit;}
-    button {padding:10px 14px; border-radius:8px; border:none; cursor:pointer; background:#00f260; color:#000; font-weight:600;}
-    table {width:100%; border-collapse:collapse; margin-top:12px;}
-    td, th {padding:8px; border-bottom:1px solid rgba(255,255,255,0.03);}
-    .small {font-size:0.9rem; color: #cbd5ff;}
-    .muted {color: #9aa3c7;}
-    .result-box {background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-top:12px;}
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
+  <div class="stars"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+
   <div class="section">
     <h2>🔍 Password Analyzer</h2>
-    <p class="small">Incolla qui la password da analizzare oppure clicca <em>Carica da localStorage</em> se l'app salvata contiene una password.</p>
+    <input type="text" id="passwordInput" placeholder="Enter your password">
+    <button onclick="analyze()">Analyze</button>
 
-    <label>Password</label>
-    <input id="pwdInput" type="text" placeholder="Inserisci password da analizzare">
+    <div class="progress"><div class="bar" id="bar"></div></div>
 
-    <div style="display:flex; gap:8px; margin-top:10px;">
-      <button onclick="analyzeFromInput()">Analizza</button>
-      <button onclick="loadFromLocalStorage()">Carica da localStorage</button>
-      <button onclick="clearInput()">Pulisci</button>
-    </div>
+    <table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Entered Password</td><td id="pwdDisplay">-</td></tr>
+      <tr><td>Length</td><td id="lengthVal">-</td></tr>
+      <tr><td>Contains Numbers</td><td id="hasNumbers">-</td></tr>
+      <tr><td>Contains Symbols</td><td id="hasSymbols">-</td></tr>
+      <tr><td>Estimated Strength</td><td id="strength">-</td></tr>
+      <tr><td>Estimated Crack Time</td><td id="crackTime">-</td></tr>
+    </table>
 
-    <div class="result-box" id="analysisResult" style="display:none;">
-      <h3>Risultato</h3>
-      <p><strong>Password:</strong> <span id="shownPwd"></span></p>
-      <p><strong>Lunghezza:</strong> <span id="pwdLen"></span> &nbsp; <strong>Entropia stimata:</strong> <span id="pwdEntropy"></span> bit</p>
-      <p id="pwdStrength" class="muted"></p>
+    <canvas id="passwordChart" style="margin-top: 30px;"></canvas>
 
-      <h4>Dati utente (se presenti)</h4>
-      <table id="userDataTable">
-        <tr><td>Nome</td><td id="rName"></td></tr>
-        <tr><td>Cognome</td><td id="rSurname"></td></tr>
-        <tr><td>Età</td><td id="rAge"></td></tr>
-        <tr><td>Email</td><td id="rEmail"></td></tr>
-        <tr><td>Telefono</td><td id="rPhone"></td></tr>
-        <tr><td>Residenza</td><td id="rResidence"></td></tr>
-      </table>
-
-      <h4>Stima durata per crack (diversi scenari)</h4>
-      <table id="crackTable">
-        <thead><tr><th>Scenario</th><th>Velocità (guess/s)</th><th>Tempo stimato</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
+    <a href="Forum.html">
+      <button style="margin-top: 30px; font-weight: bold; background-color: #2a2f5c">
+        🔐 Generate Secure Password
+      </button>
+    </a>
   </div>
 
-<script>
-  // --- Utility per entropia e formattazione ---
-  function detectPoolSize(pwd){
-    let pool = 0;
-    if (/[a-z]/.test(pwd)) pool += 26;
-    if (/[A-Z]/.test(pwd)) pool += 26;
-    if (/[0-9]/.test(pwd)) pool += 10;
-    // consider common symbols set size
-    if (/[^A-Za-z0-9]/.test(pwd)) pool += 32;
-    return pool || 1;
-  }
+  <script>
+    function analyze() {
+      const pwd = document.getElementById("passwordInput").value;
+      const length = pwd.length;
+      const hasNumbers = /\d/.test(pwd);
+      const hasSymbols = /[!@#$%^&*()]/.test(pwd);
+      let score = 0;
+      if (length>= 8) score += 1;
+      if (hasNumbers) score += 1;
+      if (hasSymbols) score += 1;
 
-  function entropyBits(pwd){
-    const pool = detectPoolSize(pwd);
-    return pwd.length * Math.log2(pool);
-  }
+      const strengthLevels = ["Weak", "Medium", "Good", "Strong"];
+      const strength = strengthLevels[score];
+      const crackTime = estimateCrackTime(score, length);
 
-  // format time from seconds using log10 to avoid overflow
-  function formatTimeFromSecondsSecondsLog10(log10Seconds){
-    if (!isFinite(log10Seconds)) return "∞";
-    if (log10Seconds < 0) return " < 1 s";
-    // convert to human friendly units
-    const seconds = Math.pow(10, log10Seconds % 1) * Math.pow(10, Math.floor(log10Seconds)); // not used directly
-    // we'll compute magnitude
-    const sec = Math.pow(10, log10Seconds);
-    const units = [
-      {label: "secondi", value: 1},
-      {label: "minuti", value: 60},
-      {label: "ore", value: 3600},
-      {label: "giorni", value: 3600*24},
-      {label: "anni", value: 3600*24*365},
-    ];
-    // try convert to largest reasonable unit
-    for (let i = units.length-1; i >= 0; i--){
-      const unitSeconds = units[i].value;
-      const log10UnitSeconds = Math.log10(unitSeconds);
-      if (log10Seconds >= log10UnitSeconds){
-        const log10Val = log10Seconds - log10UnitSeconds;
-        // mantissa
-        const mantissa = Math.pow(10, log10Val % 1);
-        const magnitude = Math.floor(log10Val);
-        const value = mantissa * Math.pow(10, magnitude);
-        // format with 2 significant digits
-        const formatted = value >= 100 ? Math.round(value) : (value >= 10 ? value.toFixed(1) : value.toFixed(2));
-        return `${formatted} ${units[i].label}`;
-      }
-    }
-    // if less than 1 minute
-    const secs = Math.pow(10, log10Seconds);
-    return secs < 1 ? `${secs.toFixed(2)} secondi` : `${Math.round(secs)} secondi`;
-  }
+      document.getElementById("pwdDisplay").textContent = pwd || "-";
+      document.getElementById("lengthVal").textContent = length;
+      document.getElementById("hasNumbers").textContent = hasNumbers? "✅": "❌";
+      document.getElementById("hasSymbols").textContent = hasSymbols? "✅": "❌";
+      document.getElementById("strength").textContent = strength;
+      document.getElementById("crackTime").textContent = crackTime.label;
+      document.getElementById("bar").style.width = (score * 33) + "%";
 
-  function formatTimeHuman(log10Seconds){
-    // better formatting with thresholds
-    if (!isFinite(log10Seconds)) return "∞";
-    if (log10Seconds < Math.log10(1)) return "< 1 s";
-    const sec = Math.pow(10, log10Seconds);
-    if (sec < 60) return `${Math.round(sec)} secondi`;
-    if (sec < 3600) return `${Math.round(sec/60)} minuti`;
-    if (sec < 3600*24) return `${Math.round(sec/3600)} ore`;
-    if (sec < 3600*24*365) return `${Math.round(sec/(3600*24))} giorni`;
-    const years = sec / (3600*24*365);
-    if (years < 1e3) return `${Math.round(years)} anni`;
-    if (years < 1e6) return `${(years/1e3).toFixed(2)} mila anni`;
-    if (years < 1e12) return `${(years/1e6).toFixed(2)} milioni di anni`;
-    return `${(years/1e12).toFixed(2)} miliardi di milioni di anni`;
-  }
+      renderChart(score, crackTime.value);
+}
 
-  // compute log10(seconds) safely:
-  // seconds = 2^entropy / speed  => log10(seconds) = entropy*log10(2) - log10(speed)
-  function computeLog10Seconds(entropyBits, speed){
-    const log10_2 = Math.log10(2);
-    return entropyBits * log10_2 - Math.log10(speed);
-  }
+    function estimateCrackTime(score, length) {
+      const base = Math.pow(10, score + length / 4);
+      let label = "";
+      if (base < 1e3) label = "Instant";
+      else if (base < 1e6) label = "Minutes";
+      else if (base < 1e9) label = "Hours";
+      else if (base < 1e12) label = "Days";
+      else label = "Years";
 
-  // list of scenarios
-  const scenarios = [
-    {name:"Attacco online (modesto)", speed:1e3, note:"login/online rate ~1k/s"},
-    {name:"Single CPU (offline)", speed:1e6, note:"~1M guess/s"},
-    {name:"Single GPU (desktop)", speed:1e9, note:"~1B guess/s"},
-    {name:"GPU rig (8 GPUs)", speed:1e10, note:"~10B guess/s"},
-    {name:"Cluster / botnet", speed:1e13, note:"~10T guess/s"},
-    {name:"Attacco massivo", speed:1e15, note:"~1P guess/s"}
-  ];
+      return { value: base, label};
+}
 
-  // --- UI handlers ---
-  function analyzeFromInput(){
-    const pwd = document.getElementById("pwdInput").value.trim();
-    if(!pwd){ alert("Inserisci una password da analizzare."); return; }
-    runAnalysis(pwd);
-  }
+    function renderChart(difficulty, timeValue) {
+      const ctx = document.getElementById("passwordChart").getContext("2d");
+      if (window.passwordChart) window.passwordChart.destroy();
 
-  function loadFromLocalStorage(){
-    try{
-      const data = JSON.parse(localStorage.getItem("userData"));
-      if (data && data.password){
-        document.getElementById("pwdInput").value = data.password;
-        runAnalysis(data.password);
-      } else {
-        alert("Nessuna password trovata in localStorage (userData.password).");
-      }
-      // populate user data table if present
-      populateUserDataTable(data);
-    }catch(e){
-      alert("Errore nel leggere localStorage.");
-    }
-  }
-
-  function clearInput(){
-    document.getElementById("pwdInput").value = "";
-    document.getElementById("analysisResult").style.display = "none";
-  }
-
-  function populateUserDataTable(data){
-    const fields = ["nome","cognome","eta","email","prefisso","telefono","residenza"];
-    document.getElementById("rName").textContent = data?.nome || "-";
-    document.getElementById("rSurname").textContent = data?.cognome || "-";
-    document.getElementById("rAge").textContent = data?.eta || "-";
-    document.getElementById("rEmail").textContent = data?.email || "-";
-    document.getElementById("rPhone").textContent = data?.telefono ? `${data.prefisso || ""} ${data.telefono}` : "-";
-    document.getElementById("rResidence").textContent = data?.residenza || "-";
-  }
-
-  function runAnalysis(pwd){
-    const entropy = entropyBits(pwd);
-    document.getElementById("analysisResult").style.display = "block";
-    document.getElementById("shownPwd").textContent = pwd;
-    document.getElementById("pwdLen").textContent = pwd.length;
-    document.getElementById("pwdEntropy").textContent = Math.round(entropy);
-
-    // strength message
-    let strength = "Debole";
-    if (entropy >= 80) strength = "Molto forte";
-    else if (entropy >= 60) strength = "Forte";
-    else if (entropy >= 40) strength = "Moderata";
-    else strength = "Debole";
-    document.getElementById("pwdStrength").textContent = `Valutazione: ${strength}`;
-
-    // populate crack table
-    const tbody = document.querySelector("#crackTable tbody");
-    tbody.innerHTML = "";
-    scenarios.forEach(s => {
-      const log10Sec = computeLog10Seconds(entropy, s.speed);
-      const human = formatTimeHuman(log10Sec);
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${s.name}</td><td>${s.speed.toExponential().replace('+','')}</td><td>${human}</td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // auto populate userData (if page loaded and data exists)
-  (function init(){
-    try{
-      const data = JSON.parse(localStorage.getItem("userData"));
-      if (data){
-        // if a stored password exists, show it in input (but do not auto-analyze)
-        if (data.password) document.getElementById("pwdInput").value = data.password;
-        populateUserDataTable(data);
-      }
-    }catch(e){}
-  })();
-</script>
+      window.passwordChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Password"],
+          datasets: [
+            {
+              label: "Difficulty",
+              data: [difficulty],
+              backgroundColor: "#00f260"
+},
+            {
+              label: "Crack Time (log)",
+              data: [Math.log10(timeValue)],
+              backgroundColor: "#0575e6"
+}
+          ]
+},
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "Difficulty / Time Scale"
+}
+}
+}
+}
+});
+}
+  </script>
 
 </body>
 </html>
