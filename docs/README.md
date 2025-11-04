@@ -27,6 +27,7 @@ You can open any of the following HTML files directly in your browser:
 - `index.html` — homepage
 - `Analyzer.html` — password strength analyzer
 - `Generator.html` — password generator
+- `Forum.html` — user input-based password creation
 
 
 Make sure `Wayland.css` is in the same folder as the HTML files.
@@ -42,4 +43,4 @@ You can also use the hosted version here:
 
 ---
 
-Enjoy building and customizing your own password creation toolkit!
+Enjoy building and customizing your own password creationinterface
