@@ -27,8 +27,7 @@ You can open any of the following HTML files directly in your browser:
 - `index.html` — homepage
 - `Analyzer.html` — password strength analyzer
 - `Generator.html` — password generator
-- `Forum.html` — user input-based password creation
-- `Boxe.html` — password comparison interface
+
 
 Make sure `Wayland.css` is in the same folder as the HTML files.
 
