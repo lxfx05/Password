@@ -1,132 +1,142 @@
+
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>Generator - Password Defender</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="Wayland.css">
   <style>
-    body {font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#eaeef8; background:#071026; padding:18px;}
-    .section {background: rgba(255,255,255,0.03); padding:18px; border-radius:12px; max-width:900px; margin:18px auto;}
-    input[type="number"] {width:80px; padding:8px; border-radius:8px; border:none; background: rgba(255,255,255,0.04); color:inherit;}
-    label {display:block; margin-top:8px;}
-    button {padding:10px 14px; border-radius:8px; border:none; background:#00f260; color:#000; cursor:pointer; font-weight:600;}
-    .pw-box {background: rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-top:12px; font-family: monospace; font-size:1.05rem;}
-    table {width:100%; border-collapse:collapse; margin-top:12px;}
-    td, th {padding:8px; border-bottom:1px solid rgba(255,255,255,0.03);}
+.feedback-section {
+      margin-top: 40px;
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+}
+
+.feedback-section h3 {
+      margin-bottom: 10px;
+}
+
+.feedback-option {
+      display: block;
+      margin: 8px 0;
+      padding: 10px;
+      background-color: #1e2249;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+}
+
+.feedback-option:hover {
+      background-color: #2e2c6d;
+}
+
+.modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+}
+
+.modal-content {
+      background: #1e2249;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+}
+
+.modal-content button {
+      margin-top: 15px;
+      background: #00f260;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+}
+
+.modal-content button:hover {
+      background: #00c957;
+}
   </style>
 </head>
 <body>
 
+  <div class="stars"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+
   <div class="section">
-    <h2>🎲 Password Generator (senza inserimento dati)</h2>
-
-    <div style="display:flex; align-items:center; gap:12px;">
-      <label>Lunghezza:
-        <input id="len" type="number" min="4" max="64" value="12">
-      </label>
-      <label style="margin-left:6px;"><input id="useSymbols" type="checkbox" checked> Usa simboli</label>
-      <button onclick="generate()">Genera</button>
-      <button onclick="saveToLocal()">Salva in localStorage</button>
-    </div>
-
-    <div class="pw-box" id="pwBox">Password generata: <strong id="generatedPwd">—</strong></div>
-
-    <h4>Stima durata per crack (stessi scenari)</h4>
-    <table id="crackTable">
-      <thead><tr><th>Scenario</th><th>Velocità (guess/s)</th><th>Tempo stimato</th></tr></thead>
-      <tbody></tbody>
+    <h2>✅ Result</h2>
+    <p><strong>Password generated:</strong> <span id="generatedPassword"></span></p>
+    <table>
+      <tr><td>First Name</td><td id="rName"></td></tr>
+      <tr><td>Last Name</td><td id="rSurname"></td></tr>
+      <tr><td>Age</td><td id="rAge"></td></tr>
+      <tr><td>Email</td><td id="rEmail"></td></tr>
+      <tr><td>Phone</td><td id="rPhone"></td></tr>
+      <tr><td>Residence</td><td id="rResidence"></td></tr>
+      <tr><td>Favorite Color</td><td id="rColor"></td></tr>
+      <tr><td>Favorite Food</td><td id="rFood"></td></tr>
     </table>
+    <a href="Forum.html"><button style="margin-top: 20px;"> 🎲 Generate new password</button></a>
 
+  <div id="emailModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>📧 Enter your email</h3>
+      <input type="email" id="userEmail" placeholder="e.g. name@email.com">
+      <button onclick="proceedToBoxe()">Proceed</button>
+    </div>
   </div>
 
-<script>
-  function generatePassword(length=12, useSymbols=true){
-    const lower = "abcdefghijklmnopqrstuvwxyz";
-    const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const digits = "0123456789";
-    const symbols = "!@#$%^&*()-_=+[]{};:,.<>?/";
-    let charset = lower + upper + digits;
-    if (useSymbols) charset += symbols;
-    let pwd = "";
-    for (let i=0;i<length;i++){
-      pwd += charset.charAt(Math.floor(Math.random() * charset.length));
-    }
-    return pwd;
-  }
+  <script>
+    function generatePassword() {
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+      let password = "";
+      for (let i = 0; i < 12; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+}
+      return password;
+}
 
-  // reuse entropy & formatting helpers from Analyzer (embedded here)
-  function detectPoolSize(pwd){
-    let pool = 0;
-    if (/[a-z]/.test(pwd)) pool += 26;
-    if (/[A-Z]/.test(pwd)) pool += 26;
-    if (/[0-9]/.test(pwd)) pool += 10;
-    if (/[^A-Za-z0-9]/.test(pwd)) pool += 32;
-    return pool || 1;
-  }
-  function entropyBits(pwd){ return pwd.length * Math.log2(detectPoolSize(pwd)); }
-  function computeLog10Seconds(entropyBits, speed){ return entropyBits * Math.log10(2) - Math.log10(speed); }
-  function formatTimeHuman(log10Seconds){
-    if (!isFinite(log10Seconds)) return "∞";
-    if (log10Seconds < Math.log10(1)) return "< 1 s";
-    const sec = Math.pow(10, log10Seconds);
-    if (sec < 60) return `${Math.round(sec)} secondi`;
-    if (sec < 3600) return `${Math.round(sec/60)} minuti`;
-    if (sec < 3600*24) return `${Math.round(sec/3600)} ore`;
-    if (sec < 3600*24*365) return `${Math.round(sec/(3600*24))} giorni`;
-    const years = sec / (3600*24*365);
-    if (years < 1e3) return `${Math.round(years)} anni`;
-    if (years < 1e6) return `${(years/1e3).toFixed(2)} mila anni`;
-    if (years < 1e12) return `${(years/1e6).toFixed(2)} milioni di anni`;
-    return `${(years/1e12).toFixed(2)} miliardi di milioni di anni`;
-  }
-
-  const scenarios = [
-    {name:"Attacco online (modesto)", speed:1e3},
-    {name:"Single CPU (offline)", speed:1e6},
-    {name:"Single GPU (desktop)", speed:1e9},
-    {name:"GPU rig (8 GPUs)", speed:1e10},
-    {name:"Cluster / botnet", speed:1e13},
-    {name:"Attacco massivo", speed:1e15}
-  ];
-
-  function updateCrackTable(pwd){
-    const ent = entropyBits(pwd);
-    const tbody = document.querySelector("#crackTable tbody");
-    tbody.innerHTML = "";
-    scenarios.forEach(s => {
-      const log10Sec = computeLog10Seconds(ent, s.speed);
-      const human = formatTimeHuman(log10Sec);
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${s.name}</td><td>${s.speed.toExponential().replace('+','')}</td><td>${human}</td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function generate(){
-    const len = parseInt(document.getElementById("len").value,10) || 12;
-    const useSymbols = document.getElementById("useSymbols").checked;
-    const pwd = generatePassword(len, useSymbols);
-    document.getElementById("generatedPwd").textContent = pwd;
-    updateCrackTable(pwd);
-  }
-
-  function saveToLocal(){
-    const pwd = document.getElementById("generatedPwd").textContent;
-    if (!pwd || pwd === "—") { alert("Genera prima una password."); return; }
-    try{
-      const existing = JSON.parse(localStorage.getItem("userData")) || {};
-      existing.password = pwd;
-      localStorage.setItem("userData", JSON.stringify(existing));
-      alert("Password salvata in localStorage (userData.password).");
-    }catch(e){
-      alert("Errore nel salvare in localStorage.");
-    }
-  }
-
-  // init sample
-  (function init(){ generate(); })();
-</script>
+    const data = JSON.parse(localStorage.getItem("userData"));
+    if (data) {
+      document.getElementById("rName").textContent = data.nome;
+      document.getElementById("rSurname").textContent = data.cognome;
+      document.getElementById("rAge").textContent = data.eta;
+      document.getElementById("rEmail").textContent = data.email;
+      document.getElementById("rPhone").textContent = `${data.prefisso} ${data.telefono}`;
+      document.getElementById("rResidence").textContent = data.residenza;
+      document.getElementById("rColor").textContent = data.colore;
+      document.getElementById("rFood").textContent = data.cibo;
+      document.getElementById("generatedPassword").textContent = generatePassword();
+}
+    </script>
 
 </body>
 </html>
