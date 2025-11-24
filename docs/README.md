@@ -44,3 +44,7 @@ You can also use the hosted version here:
 ---
 
 Enjoy building and customizing your own password creationinterface
+
+# Disclaimer ⚠️
+
+Any ur data filled in forim to vrate password is sexure and i not see or share that 
