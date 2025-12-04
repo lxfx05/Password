@@ -5,6 +5,23 @@
   <title>Password Defender - Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="Wayland.css" />
+  <style>
+    form label {
+      display: flex;
+      align-items: center;
+      gap: 10px; /* distanza tra checkbox e testo */
+      margin-bottom: 8px;
+    }
+
+    form input[type="number"] {
+      width: 60px;
+      margin-left: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="section">
@@ -14,27 +31,22 @@
         <input type="checkbox" id="uppercase" checked />
         Include Uppercase Letters
       </label>
-      <br />
       <label>
         <input type="checkbox" id="lowercase" checked />
         Include Lowercase Letters
       </label>
-      <br />
       <label>
         <input type="checkbox" id="numbers" checked />
         Include Numbers
       </label>
-      <br />
       <label>
         <input type="checkbox" id="symbols" />
         Include Special Characters
       </label>
-      <br />
       <label>
         Password Length:
         <input type="number" id="length" min="4" max="32" value="12" required />
       </label>
-      <br />
       <button type="submit">Generate Password</button>
     </form>
 
