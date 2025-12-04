@@ -15,7 +15,6 @@
       font-size: 16px;
     }
 
-    /* Nascondo la checkbox di default */
     form input[type="checkbox"] {
       -webkit-appearance: none;
       -moz-appearance: none;
@@ -23,13 +22,11 @@
       width: 20px;
       height: 20px;
       border: 2px solid #333;
-      border-radius: 4px; /* quadrata */
-      display: inline-block;
+      border-radius: 4px;
       position: relative;
       cursor: pointer;
     }
 
-    /* Spunta quando selezionata */
     form input[type="checkbox"]:checked::after {
       content: "";
       position: absolute;
@@ -80,9 +77,6 @@
       </label>
       <button type="submit">Generate Password</button>
     </form>
-
-    <h3>Generated Password:</h3>
-    <p id="generatedPassword" style="font-weight:bold;"></p>
   </div>
 
   <script>
@@ -98,7 +92,7 @@
       if (options.numbers) charset += numbers;
       if (options.symbols) charset += symbols;
 
-      if (!charset) return "Select at least one character type!";
+      if (!charset) return null;
 
       let password = "";
       for (let i = 0; i < options.length; i++) {
@@ -120,7 +114,17 @@
       };
 
       const password = generatePassword(options);
-      document.getElementById("generatedPassword").textContent = password;
+
+      if (!password) {
+        alert("Select at least one character type!");
+        return;
+      }
+
+      // Salvo la password in localStorage
+      localStorage.setItem("generatedPassword", password);
+
+      // Reindirizzo a Generator.html
+      window.location.href = "Generator.html";
     });
   </script>
 </body>
