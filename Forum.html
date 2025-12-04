@@ -1,69 +1,84 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Forum - Password Defender</title>
+  <title>Password Defender - Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="Wayland.css" />
 </head>
 <body>
   <div class="section">
-    <h2>📝 Fill Your Info</h2>
-    <form id="userForm">
-      <input type="text" id="nome" placeholder="First Name" required />
-      <input type="text" id="cognome" placeholder="Last Name" required />
-      <input type="number" id="eta" placeholder="Age" min="15" max="65" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="text" id="telefono" placeholder="Phone Number + Prefix" required />
-      <input type="text" id="residenza" placeholder="Residence" required />
-
-      <label for="colore">Favorite Color:</label>
-      <select id="colore" required>
-        <option value="">Select a color</option>
-        <option value="Red">Red</option>
-        <option value="Blue">Blue</option>
-        <option value="Green">Green</option>
-        <option value="Yellow">Yellow</option>
-        <option value="Purple">Purple</option>
-        <option value="Black">Black</option>
-        <option value="White">White</option>
-      </select>
-
-      <label for="cibo">Favorite Food:</label>
-      <select id="cibo" required>
-        <option value="">Select a food</option>
-        <option value="Pizza">Pizza</option>
-        <option value="Sushi">Sushi</option>
-        <option value="Pasta">Pasta</option>
-        <option value="Burger">Burger</option>
-        <option value="Salad">Salad</option>
-        <option value="Steak">Steak</option>
-        <option value="Ice Cream">Ice Cream</option>
-      </select>
-
+    <h2>🔐 Password Generator</h2>
+    <form id="passwordForm">
+      <label>
+        <input type="checkbox" id="uppercase" checked />
+        Include Uppercase Letters
+      </label>
+      <br />
+      <label>
+        <input type="checkbox" id="lowercase" checked />
+        Include Lowercase Letters
+      </label>
+      <br />
+      <label>
+        <input type="checkbox" id="numbers" checked />
+        Include Numbers
+      </label>
+      <br />
+      <label>
+        <input type="checkbox" id="symbols" />
+        Include Special Characters
+      </label>
+      <br />
+      <label>
+        Password Length:
+        <input type="number" id="length" min="4" max="32" value="12" required />
+      </label>
+      <br />
       <button type="submit">Generate Password</button>
     </form>
+
+    <h3>Generated Password:</h3>
+    <p id="generatedPassword" style="font-weight:bold;"></p>
   </div>
 
   <script>
-    document.getElementById("userForm").addEventListener("submit", function (e) {
+    function generatePassword(options) {
+      const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const lower = "abcdefghijklmnopqrstuvwxyz";
+      const numbers = "0123456789";
+      const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
+
+      let charset = "";
+      if (options.uppercase) charset += upper;
+      if (options.lowercase) charset += lower;
+      if (options.numbers) charset += numbers;
+      if (options.symbols) charset += symbols;
+
+      if (!charset) return "Select at least one character type!";
+
+      let password = "";
+      for (let i = 0; i < options.length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+      }
+      return password;
+    }
+
+    document.getElementById("passwordForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const userData = {
-        nome: document.getElementById("nome").value.trim(),
-        cognome: document.getElementById("cognome").value.trim(),
-        eta: document.getElementById("eta").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        telefono: document.getElementById("telefono").value.trim(),
-        residenza: document.getElementById("residenza").value.trim(),
-        colore: document.getElementById("colore").value,
-        cibo: document.getElementById("cibo").value
-};
+      const options = {
+        uppercase: document.getElementById("uppercase").checked,
+        lowercase: document.getElementById("lowercase").checked,
+        numbers: document.getElementById("numbers").checked,
+        symbols: document.getElementById("symbols").checked,
+        length: parseInt(document.getElementById("length").value)
+      };
 
-      localStorage.setItem("userData", JSON.stringify(userData));
-      window.location.href = "Generator.html";
-});
+      const password = generatePassword(options);
+      document.getElementById("generatedPassword").textContent = password;
+    });
   </script>
 </body>
 </html>
