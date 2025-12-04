@@ -9,8 +9,37 @@
     form label {
       display: flex;
       align-items: center;
-      gap: 10px; /* distanza tra checkbox e testo */
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Nascondo la checkbox di default */
+    form input[type="checkbox"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #333;
+      border-radius: 4px; /* quadrata */
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    /* Spunta quando selezionata */
+    form input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 0px;
+      width: 6px;
+      height: 12px;
+      border: solid #000;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
     }
 
     form input[type="number"] {
@@ -20,6 +49,8 @@
 
     button {
       margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
     }
   </style>
 </head>
