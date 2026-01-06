@@ -1,32 +1,245 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Password Defender</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Wayland.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePass Pro | Core Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --bg: #050507; --accent: #3b82f6; --surface: rgba(18, 18, 23, 0.9); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #f4f4f5; min-height: 100vh; overflow-x: hidden; }
+        .space-font { font-family: 'Space Grotesk', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        
+        .bg-glow {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 20% 30%, #1e1b4b 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, #1e3a8a 0%, #050507 100%);
+            z-index: -1; opacity: 0.6;
+        }
+
+        .glass { background: var(--surface); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+        /* Scanner Animation */
+        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.6s ease; }
+        .scan-line { width: 100%; height: 2px; background: var(--accent); position: absolute; box-shadow: 0 0 15px var(--accent); animation: scan 2s ease-in-out infinite; }
+        @keyframes scan { 0%, 100% { top: 0%; } 50% { top: 100%; } }
+
+        /* Tooltip style */
+        .copy-confirm { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
+    </style>
 </head>
 <body>
 
-  <div class="stars"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
+    <div id="loader">
+        <div class="relative w-32 h-32 border border-blue-500/30 rounded-2xl flex items-center justify-center overflow-hidden">
+            <div class="scan-line"></div>
+            <i class="fas fa-fingerprint text-5xl text-blue-500 animate-pulse"></i>
+        </div>
+    </div>
 
-  <div class="section">
-    <h1>🔐 Welcome on Password Generator</h1>
-    <p>You will be redirect in a few seconds ...</p>
-    <a href="Analyzer.html"><button>Go now</button></a>
-  </div>
+    <div class="bg-glow"></div>
 
-  <script>
-    setTimeout(() => {
-      window.location.href = "Analyzer.html";
-}, 3000);
-  </script>
+    <nav class="max-w-6xl mx-auto p-8 flex justify-between items-center relative z-10">
+        <div class="flex items-center gap-3">
+            <span class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fas fa-key text-white"></i>
+            </span>
+            <span class="space-font font-bold text-2xl tracking-tighter">CORE <span class="text-blue-500">SEC</span></span>
+        </div>
+        <div class="flex gap-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+            <button onclick="showPage('generator')" class="hover:text-blue-400 transition">Generator</button>
+            <button onclick="showPage('analyzer')" class="hover:text-blue-400 transition">Security Lab</button>
+        </div>
+    </nav>
 
+    <main class="max-w-4xl mx-auto px-6 py-10 relative z-10">
+        
+        <section id="page-generator" class="page-content block">
+            <header class="mb-10 text-center">
+                <h1 class="space-font text-5xl font-bold mb-3 tracking-tight">Vault Generator</h1>
+                <p class="text-gray-400 max-w-lg mx-auto">Genera chiavi crittografiche ad alta entropia con protezione locale side-channel.</p>
+            </header>
+
+            <div class="glass p-10 rounded-[32px] shadow-2xl relative overflow-hidden">
+                <div class="mb-10">
+                    <div class="text-[10px] uppercase tracking-widest text-blue-500 font-bold mb-2">Generated Key</div>
+                    <input type="text" id="passResult" readonly 
+                           class="w-full bg-black/50 border border-white/5 p-8 rounded-2xl text-3xl code-font text-white text-center shadow-inner">
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 mb-10">
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-end">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Entropy Length</label>
+                            <span id="lenVal" class="text-2xl space-font font-bold text-blue-500">24</span>
+                        </div>
+                        <input type="range" id="length" min="12" max="128" value="24" 
+                               class="w-full h-1.5 bg-blue-900/20 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <div class="flex justify-between text-[10px] text-gray-600 font-bold uppercase">
+                            <span>Standard</span>
+                            <span>Ultra Secure</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="toggleOption(this, 'upper')" class="opt-btn glass p-4 rounded-xl text-xs font-bold flex flex-col items-center gap-2 border-blue-500/40 text-blue-400">
+                            <i class="fas fa-font"></i> CAPS
+                        </button>
+                        <button onclick="toggleOption(this, 'nums')" class="opt-btn glass p-4 rounded-xl text-xs font-bold flex flex-col items-center gap-2 border-white/5 text-gray-500">
+                            <i class="fas fa-hashtag"></i> NUMS
+                        </button>
+                        <button onclick="toggleOption(this, 'syms')" class="opt-btn glass p-4 rounded-xl text-xs font-bold flex flex-col items-center gap-2 border-white/5 text-gray-500">
+                            <i class="fas fa-at"></i> SYMS
+                        </button>
+                        <button onclick="toggleOption(this, 'ambig')" class="opt-btn glass p-4 rounded-xl text-xs font-bold flex flex-col items-center gap-2 border-white/5 text-gray-500">
+                            <i class="fas fa-eye-slash"></i> NO AMB
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4">
+                    <button onclick="generate()" class="flex-grow bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-bold space-font tracking-wide transition-all active:scale-95 shadow-lg shadow-blue-600/20">
+                        GENERATE NEW VAULT KEY
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="copyPass()" class="bg-white/5 hover:bg-white/10 p-5 rounded-2xl border border-white/10 transition" title="Copia in Clipboard">
+                            <i class="fas fa-copy text-xl"></i>
+                        </button>
+                        <button onclick="downloadPass()" class="bg-white/5 hover:bg-white/10 p-5 rounded-2xl border border-white/10 transition" title="Scarica .txt">
+                            <i class="fas fa-file-download text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-analyzer" class="page-content hidden">
+            <header class="mb-10 text-center">
+                <h1 class="space-font text-5xl font-bold mb-3 tracking-tight">Security Lab</h1>
+                <p class="text-gray-400 max-w-lg mx-auto">Analisi forense della robustezza crittografica ed entropia dei bit.</p>
+            </header>
+
+            <div class="glass p-10 rounded-[32px]">
+                <input type="password" id="checkPass" oninput="analyze()"
+                       class="w-full bg-black/50 border border-white/10 p-6 rounded-2xl code-font text-white mb-8 focus:border-blue-500 outline-none text-xl"
+                       placeholder="Analizza password esistente...">
+                
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="glass p-6 rounded-2xl border-white/5">
+                        <div class="text-[10px] text-gray-500 font-bold mb-1">BIT ENTROPY</div>
+                        <div id="entropyVal" class="text-2xl font-bold space-font">0.0</div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border-white/5">
+                        <div class="text-[10px] text-gray-500 font-bold mb-1">CRACK TIME</div>
+                        <div id="crackTime" class="text-2xl font-bold space-font text-green-500">---</div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border-white/5">
+                        <div class="text-[10px] text-gray-500 font-bold mb-1">SCORE</div>
+                        <div id="securityScore" class="text-2xl font-bold space-font">LOW</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="copy-confirm">COPIATO!</div>
+
+    <script>
+        // State
+        let config = { upper: true, nums: false, syms: false, ambig: false };
+
+        // Navigation
+        function showPage(id) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-'+id).classList.remove('hidden');
+        }
+
+        // Loader
+        window.onload = () => setTimeout(() => document.getElementById('loader').style.opacity = '0', 1000);
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 1600);
+
+        // Generator logic
+        document.getElementById('length').oninput = function() {
+            document.getElementById('lenVal').innerText = this.value;
+            generate();
+        };
+
+        function toggleOption(btn, opt) {
+            config[opt] = !config[opt];
+            btn.classList.toggle('text-blue-400', config[opt]);
+            btn.classList.toggle('border-blue-500/40', config[opt]);
+            btn.classList.toggle('text-gray-500', !config[opt]);
+            btn.classList.toggle('border-white/5', !config[opt]);
+            generate();
+        }
+
+        function generate() {
+            let chars = "abcdefghijklmnopqrstuvwxyz";
+            if(config.upper) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if(config.nums) chars += "0123456789";
+            if(config.syms) chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+            if(config.ambig) chars = chars.replace(/[Il1O0]/g, "");
+
+            let pass = "";
+            const array = new Uint32Array(document.getElementById('length').value);
+            window.crypto.getRandomValues(array);
+            for(let i=0; i<array.length; i++) {
+                pass += chars.charAt(array[i] % chars.length);
+            }
+            document.getElementById('passResult').value = pass;
+        }
+
+        // Clip & Download
+        function copyPass() {
+            const val = document.getElementById('passResult').value;
+            navigator.clipboard.writeText(val);
+            const t = document.getElementById('toast');
+            t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2000);
+        }
+
+        function downloadPass() {
+            const pass = document.getElementById('passResult').value;
+            const blob = new Blob([`CoreSec Vault Password\nGenerated: ${new Date().toLocaleString()}\n\nPassword: ${pass}`], {type: "text/plain"});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `secure_key_${Date.now()}.txt`;
+            a.click();
+        }
+
+        // Advanced Analysis
+        function analyze() {
+            const p = document.getElementById('checkPass').value;
+            if(!p) return;
+
+            let pool = 0;
+            if(/[a-z]/.test(p)) pool += 26;
+            if(/[A-Z]/.test(p)) pool += 26;
+            if(/[0-9]/.test(p)) pool += 10;
+            if(/[^a-zA-Z0-9]/.test(p)) pool += 32;
+
+            const entropy = Math.log2(Math.pow(pool, p.length));
+            document.getElementById('entropyVal').innerText = entropy.toFixed(1);
+
+            let time = "---";
+            let color = "text-red-500";
+            if(entropy > 80) { time = "Centuries"; color = "text-emerald-500"; }
+            else if(entropy > 60) { time = "Years"; color = "text-green-400"; }
+            else if(entropy > 40) { time = "Days"; color = "text-yellow-500"; }
+            else { time = "Minutes"; color = "text-red-500"; }
+
+            document.getElementById('crackTime').innerText = time;
+            document.getElementById('crackTime').className = `text-2xl font-bold space-font ${color}`;
+            document.getElementById('securityScore').innerText = entropy > 70 ? "ELITE" : entropy > 40 ? "SAFE" : "WEAK";
+        }
+
+        generate();
+    </script>
 </body>
-</html>
+                  </html>
+                  
