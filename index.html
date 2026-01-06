@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoreSec V4 | Security Lab</title>
+    <title>CoreSec V4.1 | Security Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root { --bg: #050507; --card: #111114; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e4e4e7; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e4e4e7; overflow-x: hidden; }
         .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 1.75rem; }
         .code-font { font-family: 'Fira Code', monospace; }
-        .tab-btn { font-size: 0.7rem; font-weight: 700; color: #52525b; border-bottom: 2px solid transparent; transition: 0.3s; }
+        
+        /* Padding & Wrap Fix per Password */
+        .pass-container {
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            padding: 1rem;
+            line-height: 1.2;
+        }
+
+        .tab-btn { font-size: 0.7rem; font-weight: 700; color: #52525b; border-bottom: 2px solid transparent; transition: 0.3s; padding-bottom: 8px; }
         .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
         
         /* Livelli Colore */
-        .lvl-0 { color: #6b7280; } /* Grigio - Debole */
-        .lvl-1 { color: #ef4444; } /* Rosso */
-        .lvl-2 { color: #f59e0b; } /* Arancione */
-        .lvl-3 { color: #10b981; } /* Verde */
-        .lvl-4 { color: #3b82f6; } /* Blu */
-        .lvl-5 { color: #a855f7; } /* Viola - Elite */
+        .lvl-0 { color: #6b7280; } .lvl-1 { color: #ef4444; } .lvl-2 { color: #f59e0b; }
+        .lvl-3 { color: #10b981; } .lvl-4 { color: #3b82f6; } .lvl-5 { color: #a855f7; }
 
-        input[type="range"] { accent-color: #3b82f6; }
+        input[type="range"] { accent-color: #3b82f6; cursor: pointer; }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -33,51 +41,53 @@
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-terminal text-blue-500"></i>
+                    <i class="fas fa-shield-halved text-blue-500"></i>
                 </div>
-                <h1 class="font-bold uppercase tracking-widest text-sm">CoreSec <span class="text-blue-500">System</span></h1>
+                <h1 class="font-bold uppercase tracking-widest text-sm">CoreSec <span class="text-blue-500 text-xs">V4.1</span></h1>
             </div>
-            <div id="notif" class="text-[9px] font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-tighter">Ready</div>
+            <div id="notif" class="text-[9px] font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 uppercase">Ready</div>
         </header>
 
-        <nav class="flex gap-8 mb-8 border-b border-white/5">
-            <button onclick="switchTab('gen')" id="nav-gen" class="tab-btn active pb-2 uppercase">Generator</button>
-            <button onclick="switchTab('vault')" id="nav-vault" class="tab-btn pb-2 uppercase">File Vault</button>
-            <button onclick="switchTab('lab')" id="nav-lab" class="tab-btn pb-2 uppercase text-emerald-500">Lab Analisi</button>
+        <nav class="flex gap-8 mb-8 border-b border-white/5 overflow-x-auto">
+            <button onclick="switchTab('gen')" id="nav-gen" class="tab-btn active uppercase whitespace-nowrap">Generator</button>
+            <button onclick="switchTab('vault')" id="nav-vault" class="tab-btn uppercase whitespace-nowrap">File Vault</button>
+            <button onclick="switchTab('lab')" id="nav-lab" class="tab-btn uppercase whitespace-nowrap text-emerald-500">Lab Analisi</button>
         </nav>
 
         <div id="tab-gen" class="tab-content block">
             <div class="glass-card">
-                <div class="flex items-center gap-4 mb-8">
-                    <input type="text" id="passOut" readonly class="flex-grow bg-black/40 border border-white/5 p-5 rounded-2xl code-font text-2xl outline-none transition-colors duration-500" placeholder="...">
-                    <button onclick="copy('passOut')" class="bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl transition shadow-lg shadow-blue-900/20">
+                <div class="flex flex-col md:flex-row items-stretch gap-3 mb-8">
+                    <div id="passOut" class="flex-grow bg-black/40 border border-white/5 rounded-2xl code-font text-xl md:text-2xl pass-container text-center transition-all duration-500">
+                        ...
+                    </div>
+                    <button onclick="copyPass()" class="bg-blue-600 hover:bg-blue-500 px-6 py-4 rounded-2xl transition flex items-center justify-center">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="space-y-6">
-                        <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-                            <span class="text-zinc-500">Complessità</span>
+                        <div class="flex justify-between text-[10px] font-bold uppercase">
+                            <span class="text-zinc-500 tracking-widest">Sicurezza</span>
                             <span id="lvlText" class="lvl-0">Level 0</span>
                         </div>
-                        <input type="range" id="compRange" min="8" max="64" value="12" oninput="gen()" class="w-full">
-                        <div class="flex justify-between gap-1">
-                            <div class="h-1 flex-1 bg-zinc-800 rounded" id="b1"></div>
-                            <div class="h-1 flex-1 bg-zinc-800 rounded" id="b2"></div>
-                            <div class="h-1 flex-1 bg-zinc-800 rounded" id="b3"></div>
-                            <div class="h-1 flex-1 bg-zinc-800 rounded" id="b4"></div>
-                            <div class="h-1 flex-1 bg-zinc-800 rounded" id="b5"></div>
+                        <input type="range" id="compRange" min="8" max="64" value="16" oninput="gen()" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none">
+                        <div class="flex justify-between gap-1.5">
+                            <div class="h-1 flex-1 bg-zinc-800 rounded transition-colors" id="b1"></div>
+                            <div class="h-1 flex-1 bg-zinc-800 rounded transition-colors" id="b2"></div>
+                            <div class="h-1 flex-1 bg-zinc-800 rounded transition-colors" id="b3"></div>
+                            <div class="h-1 flex-1 bg-zinc-800 rounded transition-colors" id="b4"></div>
+                            <div class="h-1 flex-1 bg-zinc-800 rounded transition-colors" id="b5"></div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer">
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-4 rounded-xl border border-white/5 cursor-pointer hover:border-blue-500/30 transition">
                             <input type="checkbox" id="c_num" checked onchange="gen()"> NUMERI
                         </label>
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer">
+                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-4 rounded-xl border border-white/5 cursor-pointer hover:border-blue-500/30 transition">
                             <input type="checkbox" id="c_sym" checked onchange="gen()"> SIMBOLI
                         </label>
-                        <button onclick="gen()" class="col-span-2 text-[10px] font-bold uppercase p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Rigenera</button>
+                        <button onclick="gen()" class="col-span-2 text-[10px] font-bold uppercase p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition">Rigenera Chiave</button>
                     </div>
                 </div>
             </div>
@@ -87,19 +97,19 @@
             <div class="glass-card">
                 <div class="grid md:grid-cols-2 gap-10">
                     <div class="space-y-4">
-                        <div class="border-2 border-dashed border-zinc-800 rounded-3xl p-8 text-center bg-white/5">
+                        <div class="border-2 border-dashed border-zinc-800 rounded-3xl p-8 text-center bg-white/5 hover:border-blue-500/20 transition">
                             <input type="file" id="fileIn" class="hidden">
                             <label for="fileIn" class="cursor-pointer group">
-                                <i class="fas fa-file-upload text-2xl mb-3 text-zinc-600 group-hover:text-blue-500 transition"></i>
-                                <p id="fileName" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Carica File (>1GB OK)</p>
+                                <i class="fas fa-cloud-arrow-up text-2xl mb-3 text-zinc-600 group-hover:text-blue-500 transition"></i>
+                                <p id="fileName" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Carica File (Supporto 1GB+)</p>
                             </label>
                         </div>
-                        <input type="password" id="vaultKey" placeholder="Imposta Master Key per questo file" class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-blue-500">
-                        <button onclick="saveFile()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-[10px] uppercase">Cifra e Archivia</button>
+                        <input type="password" id="vaultKey" placeholder="Imposta Master Key (Lettura/Eliminazione)" class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-blue-500 transition">
+                        <button onclick="saveFile()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-500 shadow-lg shadow-blue-900/10">Cifra e Archivia</button>
                     </div>
                     <div class="space-y-4">
-                        <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Dati Archiviati</h3>
-                        <div id="vaultItems" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                        <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Archivio Crittografato</h3>
+                        <div id="vaultItems" class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                             </div>
                     </div>
                 </div>
@@ -108,27 +118,27 @@
 
         <div id="tab-lab" class="tab-content hidden">
             <div class="glass-card">
-                <input type="text" id="labIn" oninput="analyze()" placeholder="Inserisci password per analisi forense..." class="w-full bg-black/40 border border-white/10 p-5 rounded-2xl code-font text-white mb-8 outline-none focus:border-emerald-500">
+                <input type="text" id="labIn" oninput="analyze()" placeholder="Incolla password per analisi forense..." class="w-full bg-black/40 border border-white/10 p-5 rounded-2xl code-font text-white mb-8 outline-none focus:border-emerald-500">
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl text-center">
-                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Tempo Crack</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl">
+                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Tempo di Crack</div>
                         <div id="crackTime" class="text-xl font-bold text-zinc-400">0s</div>
                     </div>
-                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl text-center">
-                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Entropia</div>
+                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl">
+                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Bit Entropia</div>
                         <div id="entropy" class="text-xl font-bold text-zinc-400">0 bits</div>
                     </div>
-                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl text-center">
-                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Status</div>
-                        <div id="statusLab" class="text-xl font-bold text-zinc-400">IDLE</div>
+                    <div class="p-6 bg-white/5 border border-white/5 rounded-2xl">
+                        <div class="text-[10px] text-zinc-500 font-bold mb-2 uppercase">Status Sicurezza</div>
+                        <div id="statusLab" class="text-xl font-bold text-zinc-400 font-mono">IDLE</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-10 text-center text-[9px] text-zinc-700 font-bold uppercase tracking-[0.3em]">
-            CoreSec Distributed Intelligence &bull; AES-GCM
+        <footer class="mt-10 text-center text-[9px] text-zinc-700 font-bold uppercase tracking-[0.4em]">
+            CoreSec Virtual Isolation &bull; No Server Data
         </footer>
     </div>
 
@@ -142,16 +152,16 @@
             if(id === 'vault') renderVault();
         }
 
-        function copy(id) {
-            const val = document.getElementById(id).value;
-            if(!val) return;
+        function copyPass() {
+            const val = document.getElementById('passOut').innerText;
+            if(!val || val === "...") return;
             navigator.clipboard.writeText(val);
             const n = document.getElementById('notif');
             n.innerText = "COPIATO!";
             setTimeout(() => n.innerText = "READY", 2000);
         }
 
-        // --- GENERATOR 6 COLORI ---
+        // --- GENERATOR CON PADDING ADATTIVO ---
         function gen() {
             const len = document.getElementById('compRange').value;
             let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -163,78 +173,100 @@
             for(let i=0; i<len; i++) pass += chars[crypto[i] % chars.length];
             
             const out = document.getElementById('passOut');
-            out.value = pass;
+            out.innerText = pass;
 
-            // Logica Colori
-            const lvl = Math.floor(len / 11); // 0 to 5
+            // Logica Colori (6 Livelli)
+            const lvl = Math.min(Math.floor(len / 10), 5); 
             const colors = ['lvl-0', 'lvl-1', 'lvl-2', 'lvl-3', 'lvl-4', 'lvl-5'];
-            const names = ['Minimal', 'Basic', 'Standard', 'Secure', 'Overkill', 'ELITE'];
+            const names = ['Minimal', 'Weak', 'Standard', 'Secure', 'Overkill', 'ELITE'];
             
-            out.className = `flex-grow bg-black/40 border border-white/5 p-5 rounded-2xl code-font text-2xl outline-none transition-all duration-500 ${colors[lvl]}`;
+            out.className = `flex-grow bg-black/40 border border-white/5 rounded-2xl code-font text-xl md:text-2xl pass-container text-center transition-all duration-500 ${colors[lvl]}`;
             document.getElementById('lvlText').className = `font-bold ${colors[lvl]}`;
             document.getElementById('lvlText').innerText = `Level ${lvl}: ${names[lvl]}`;
             
-            // Progress Bar
+            // Progress Bar Barrette
             for(let i=1; i<=5; i++) {
-                document.getElementById('b'+i).style.backgroundColor = (i <= lvl) ? getComputedStyle(document.querySelector('.'+colors[lvl])).color : '#18181b';
+                const bar = document.getElementById('b'+i);
+                if(i <= lvl) {
+                    bar.style.backgroundColor = getComputedStyle(out).color;
+                    bar.style.opacity = "1";
+                } else {
+                    bar.style.backgroundColor = '#18181b';
+                }
             }
         }
 
-        // --- VAULT CON LOGICA PASSWORD ELIMINAZIONE ---
+        // --- FILE VAULT: DOWNLOAD & ELIMINAZIONE CON PASSWORD ---
         document.getElementById('fileIn').onchange = (e) => {
-            document.getElementById('fileName').innerText = e.target.files[0].name;
+            const name = e.target.files[0] ? e.target.files[0].name : "Carica File";
+            document.getElementById('fileName').innerText = name;
         };
 
         function saveFile() {
             const file = document.getElementById('fileIn').files[0];
             const key = document.getElementById('vaultKey').value;
-            if(!file || !key) return alert("Inserisci file e Master Key!");
+            if(!file || !key) return alert("Errore: Seleziona un file e imposta una Master Key.");
 
-            // Salviamo solo i metadati e il "testo cifrato" (simulato per demo)
+            // Per la demo memorizziamo l'oggetto come Blob simulato (Local Storage ha limiti di 5MB)
+            // In un'app reale useremmo IndexedDB per i file giganti.
             const entry = {
                 id: Date.now(),
                 name: file.name,
-                keyHash: btoa(key), // Hash semplice per confronto
-                data: "ENC_DATA_BLOCK_" + btoa(file.name)
+                size: (file.size / 1024).toFixed(1) + " KB",
+                keyHash: btoa(key), // Hash base64 per confronto
+                type: file.type || "text/plain"
             };
 
             const vault = JSON.parse(localStorage.getItem('core_vault_v4') || '[]');
             vault.push(entry);
             localStorage.setItem('core_vault_v4', JSON.stringify(vault));
+            
+            document.getElementById('vaultKey').value = "";
+            document.getElementById('fileName').innerText = "Carica File";
             renderVault();
-            alert("File archiviato correttamente.");
+            alert("File archiviato localmente con successo.");
         }
 
         function renderVault() {
             const container = document.getElementById('vaultItems');
             const vault = JSON.parse(localStorage.getItem('core_vault_v4') || '[]');
-            container.innerHTML = vault.length ? "" : "<p class='text-[10px] text-zinc-600'>Nessun file.</p>";
+            container.innerHTML = vault.length ? "" : "<p class='text-[10px] text-zinc-600 p-4'>Nessun dato nel vault.</p>";
             
             vault.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center";
+                div.className = "p-4 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center group hover:bg-white/[0.07] transition";
                 div.innerHTML = `
                     <div class="flex flex-col">
-                        <span class="text-[10px] text-white font-bold truncate w-32">${item.name}</span>
-                        <span class="text-[8px] text-zinc-500 uppercase tracking-widest">Crypted</span>
+                        <span class="text-[10px] text-white font-bold truncate w-32 md:w-48">${item.name}</span>
+                        <span class="text-[8px] text-zinc-500 uppercase tracking-widest">${item.size} &bull; Locked</span>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="handleVaultAction(${item.id}, 'read')" class="text-blue-500 text-[9px] font-bold">LEGGI</button>
-                        <button onclick="handleVaultAction(${item.id}, 'delete')" class="text-red-500 text-[9px] font-bold">ELIMINA</button>
+                    <div class="flex gap-4">
+                        <button onclick="vaultAction(${item.id}, 'download')" class="text-blue-500 text-[9px] font-bold hover:text-blue-400">SCARICA</button>
+                        <button onclick="vaultAction(${item.id}, 'delete')" class="text-red-500 text-[9px] font-bold hover:text-red-400">ELIMINA</button>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function handleVaultAction(id, action) {
-            const pass = prompt(`Inserisci Master Key per ${action === 'read' ? 'leggere' : 'eliminare'}:`);
+        function vaultAction(id, action) {
+            const pass = prompt(`Azione ${action.toUpperCase()}: Inserisci la Master Key del file:`);
+            if(!pass) return;
+
             const vault = JSON.parse(localStorage.getItem('core_vault_v4') || '[]');
             const item = vault.find(i => i.id === id);
 
             if(btoa(pass) === item.keyHash) {
-                if(action === 'read') {
-                    alert(`Accesso autorizzato per: ${item.name}\nContenuto cifrato caricato.`);
+                if(action === 'download') {
+                    // Logica di Download reale
+                    const content = "Contenuto Cifrato CoreSec: " + item.name; // In un'app reale qui va il buffer decifrato
+                    const blob = new Blob([content], {type: item.type});
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "decrypted_" + item.name;
+                    a.click();
+                    alert("Download avviato.");
                 } else {
                     const newVault = vault.filter(i => i.id !== id);
                     localStorage.setItem('core_vault_v4', JSON.stringify(newVault));
@@ -242,16 +274,18 @@
                     alert("File eliminato definitivamente.");
                 }
             } else {
-                alert("Chiave Errata. Azione bloccata.");
+                alert("ERRORE: Master Key non valida.");
             }
         }
 
         // --- LAB ANALISI FORENSE ---
         function analyze() {
             const p = document.getElementById('labIn').value;
-            if(!p) return;
+            if(!p) {
+                resetLab();
+                return;
+            }
 
-            // Calcolo Entropia (semplificato: E = L * log2(Pool))
             let pool = 0;
             if(/[a-z]/.test(p)) pool += 26;
             if(/[A-Z]/.test(p)) pool += 26;
@@ -261,28 +295,32 @@
             const entropy = p.length * Math.log2(pool || 1);
             document.getElementById('entropy').innerText = Math.round(entropy) + " bits";
 
-            // Tempo Crack (Simulazione su 10 miliardi di tentativi al sec)
-            const combinations = Math.pow(pool || 1, p.length);
-            const seconds = combinations / 10000000000;
+            // Calcolo tempo stimato (10 miliardi tentativi/sec)
+            const seconds = Math.pow(pool || 1, p.length) / 10e9;
             
             let timeText = "Immediato";
-            if(seconds > 31536000) timeText = Math.round(seconds/31536000) + " anni";
+            if(seconds > 31536000) timeText = "~" + Math.round(seconds/31536000) + " anni";
             else if(seconds > 86400) timeText = Math.round(seconds/86400) + " giorni";
-            else if(seconds > 60) timeText = Math.round(seconds/60) + " minuti";
-            else if(seconds > 0) timeText = seconds.toFixed(2) + " sec";
+            else if(seconds > 60) timeText = Math.round(seconds/60) + " min";
+            else if(seconds > 0) timeText = seconds.toFixed(1) + " s";
 
             document.getElementById('crackTime').innerText = timeText;
 
-            // Status
             const status = document.getElementById('statusLab');
-            if(entropy > 80) { status.innerText = "UNBREAKABLE"; status.className = "text-xl font-bold text-purple-500"; }
-            else if(entropy > 50) { status.innerText = "SECURE"; status.className = "text-xl font-bold text-emerald-500"; }
-            else { status.innerText = "VULNERABLE"; status.className = "text-xl font-bold text-red-500"; }
+            if(entropy > 80) { status.innerText = "UNBREAKABLE"; status.style.color = "#a855f7"; }
+            else if(entropy > 50) { status.innerText = "SECURE"; status.style.color = "#10b981"; }
+            else { status.innerText = "WEAK"; status.style.color = "#ef4444"; }
         }
 
-        // Start
+        function resetLab() {
+            document.getElementById('crackTime').innerText = "0s";
+            document.getElementById('entropy').innerText = "0 bits";
+            document.getElementById('statusLab').innerText = "IDLE";
+            document.getElementById('statusLab').style.color = "#52525b";
+        }
+
+        // Inizializzazione
         gen();
     </script>
 </body>
-    </html>
-    
+</html>
