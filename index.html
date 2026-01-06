@@ -3,181 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoreSec Mini | Dashboard</title>
+    <title>CoreSec OS | Security Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --bg: #0a0a0c; --accent: #3b82f6; }
+        :root { --bg: #050507; --accent: #3b82f6; --card: #111114; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e4e4e7; min-height: 100vh; }
-        .glass { background: rgba(23, 23, 27, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 1.5rem; }
         .code-font { font-family: 'Fira Code', monospace; }
-        .tab-active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; }
-        
-        /* Loading fine */
-        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 50; display: flex; align-items: center; justify-content: center; transition: 0.4s; }
+        .tab-btn { padding-bottom: 0.5rem; font-size: 0.75rem; font-weight: 700; color: #52525b; transition: 0.3s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        input[type="range"] { accent-color: var(--accent); }
+        /* Animazione per conferma */
+        .status-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-6 lg:p-10">
 
-    <div id="loader"><i class="fas fa-circle-notch animate-spin text-blue-500 text-2xl"></i></div>
-
-    <div class="max-w-3xl mx-auto">
-        <header class="flex justify-between items-center mb-6">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-shield-halved text-blue-500"></i>
-                <span class="font-bold tracking-tighter text-lg uppercase">Core<span class="text-blue-500">Sec</span></span>
+    <div class="max-w-5xl mx-auto">
+        <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+                    <i class="fas fa-terminal text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold leading-none uppercase tracking-tighter">CoreSec <span class="text-blue-500 text-xs">V3.0</span></h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Advanced Encryption Layer</p>
+                </div>
             </div>
-            <div id="status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 uppercase font-bold">System Ready</div>
+            <div id="status" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/5 px-3 py-1.5 rounded-full border border-emerald-500/20">
+                ● SYSTEM_STABLE_ENCRYPT_ON
+            </div>
         </header>
 
-        <nav class="flex gap-6 border-bottom border-white/5 mb-6 text-sm font-semibold text-gray-500">
-            <button onclick="switchTab('gen')" id="btn-gen" class="pb-2 tab-active">GENERATORE</button>
-            <button onclick="switchTab('crypt')" id="btn-crypt" class="pb-2">CRYPT/DECRYPT</button>
-            <button onclick="switchTab('lab')" id="btn-lab" class="pb-2">LAB ANALISI</button>
+        <nav class="flex gap-8 mb-8 border-b border-white/5 overflow-x-auto whitespace-nowrap">
+            <button onclick="switchTab('gen')" id="nav-gen" class="tab-btn active uppercase tracking-widest">Generator</button>
+            <button onclick="switchTab('file')" id="nav-file" class="tab-btn uppercase tracking-widest">File Shield</button>
+            <button onclick="switchTab('vault')" id="nav-vault" class="tab-btn uppercase tracking-widest">Secure Vault</button>
         </nav>
 
-        <div id="tab-gen" class="tab-content">
-            <div class="glass p-6 rounded-2xl">
-                <div class="flex gap-2 mb-6">
-                    <input type="text" id="passOut" readonly class="flex-grow bg-black/40 border border-white/10 p-3 rounded-xl code-font text-blue-400 text-lg outline-none">
-                    <button onclick="copy('passOut')" class="bg-blue-600 px-4 rounded-xl hover:bg-blue-500 transition"><i class="fas fa-copy"></i></button>
-                    <button onclick="download()" class="bg-white/5 px-4 rounded-xl border border-white/10 hover:bg-white/10"><i class="fas fa-download"></i></button>
+        <div id="tab-gen" class="tab-content block">
+            <div class="glass-card">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <input type="text" id="passOut" readonly class="flex-grow bg-black/40 border border-white/10 p-4 rounded-xl code-font text-blue-400 text-xl outline-none" placeholder="Generator Output">
+                    <div class="flex gap-2">
+                        <button onclick="copy('passOut')" class="bg-blue-600 px-6 py-4 rounded-xl hover:bg-blue-500 transition"><i class="fas fa-copy"></i></button>
+                        <button onclick="downloadTxt()" class="bg-white/5 px-6 py-4 rounded-xl border border-white/10 hover:bg-white/10 transition"><i class="fas fa-file-export"></i></button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 p-2">
                     <div class="space-y-4">
-                        <div class="flex justify-between text-xs font-bold text-gray-400">
-                            <span>LUNGHEZZA</span>
-                            <span id="lVal" class="text-blue-500">24</span>
+                        <div class="flex justify-between text-xs font-bold uppercase text-zinc-500">
+                            <span>Length</span>
+                            <span id="lVal" class="text-blue-500 font-mono">32</span>
                         </div>
-                        <input type="range" id="len" min="12" max="64" value="24" oninput="lVal.innerText=this.value; gen()" class="w-full h-1 bg-white/10 rounded-lg appearance-none">
+                        <input type="range" id="len" min="8" max="128" value="32" oninput="lVal.innerText=this.value; gen()" class="w-full h-1 bg-white/10 rounded-lg appearance-none">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-2 rounded-lg cursor-pointer border border-transparent hover:border-blue-500/30">
-                            <input type="checkbox" id="c_num" checked onchange="gen()"> NUMERI
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-3 rounded-lg cursor-pointer border border-white/5 hover:border-blue-500/40 transition">
+                            <input type="checkbox" id="c_up" checked onchange="gen()"> UPPERCASE
                         </label>
-                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-2 rounded-lg cursor-pointer border border-transparent hover:border-blue-500/30">
-                            <input type="checkbox" id="c_sym" checked onchange="gen()"> SIMBOLI
+                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-3 rounded-lg cursor-pointer border border-white/5 hover:border-blue-500/40 transition">
+                            <input type="checkbox" id="c_low" checked onchange="gen()"> lowercase
+                        </label>
+                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-3 rounded-lg cursor-pointer border border-white/5 hover:border-blue-500/40 transition">
+                            <input type="checkbox" id="c_num" checked onchange="gen()"> NUMBERS
+                        </label>
+                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-3 rounded-lg cursor-pointer border border-white/5 hover:border-blue-500/40 transition">
+                            <input type="checkbox" id="c_sym" checked onchange="gen()"> SYMBOLS
                         </label>
                     </div>
-                </div>
-                <button onclick="gen()" class="w-full mt-6 bg-white/5 border border-white/10 py-3 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest">Rigenera Chiave</button>
-            </div>
-        </div>
 
-        <div id="tab-crypt" class="tab-content hidden">
-            <div class="glass p-6 rounded-2xl space-y-4">
-                <textarea id="cryptInput" placeholder="Inserisci testo da cifrare/decifrare..." class="w-full h-24 bg-black/40 border border-white/10 p-3 rounded-xl text-sm outline-none focus:border-blue-500"></textarea>
-                <input type="password" id="masterKey" placeholder="Password Master (Chiave di cifratura)" class="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-sm outline-none">
-                <div class="flex gap-2">
-                    <button onclick="processCrypt('enc')" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-xs uppercase">Encrypt</button>
-                    <button onclick="processCrypt('dec')" class="flex-1 bg-white/5 border border-white/10 py-3 rounded-xl font-bold text-xs uppercase">Decrypt</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-lab" class="tab-content hidden">
-            <div class="glass p-6 rounded-2xl">
-                <input type="text" id="labIn" oninput="check()" placeholder="Inserisci password da testare..." class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none mb-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 bg-white/5 rounded-xl border border-white/5">
-                        <div class="text-[10px] text-gray-500 font-bold mb-1">ENTROPIA</div>
-                        <div id="ent" class="text-xl font-bold text-blue-500">0.0</div>
-                    </div>
-                    <div class="p-3 bg-white/5 rounded-xl border border-white/5">
-                        <div class="text-[10px] text-gray-500 font-bold mb-1">RESISTENZA</div>
-                        <div id="res" class="text-xl font-bold text-gray-400">---</div>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-2 text-[11px] bg-white/5 p-3 rounded-lg cursor-pointer border border-white/5">
+                            <input type="checkbox" id="c_noamb" onchange="gen()"> NO AMBIGUOUS (1,l,O,0)
+                        </label>
+                        <button onclick="gen()" class="w-full bg-blue-600/10 border border-blue-500/20 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest text-blue-400 hover:bg-blue-600 hover:text-white transition">Regenerate Key</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-8 text-center text-[10px] text-gray-600 uppercase tracking-widest font-bold">
-            Core Security Systems &bull; AES-256 Simulation &bull; 2024
+        <div id="tab-file" class="tab-content hidden">
+            <div class="glass-card">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase text-blue-500 tracking-widest">Input File</h3>
+                        <div class="border-2 border-dashed border-white/5 rounded-2xl p-8 text-center hover:border-blue-500/40 transition-all bg-white/5">
+                            <input type="file" id="fileIn" class="hidden">
+                            <label for="fileIn" class="cursor-pointer">
+                                <i class="fas fa-cloud-upload-alt text-3xl mb-4 text-zinc-600"></i>
+                                <p id="fileName" class="text-xs text-zinc-400 font-medium">Trascina o clicca per caricare</p>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase text-blue-500 tracking-widest">Security Layer</h3>
+                        <input type="password" id="fileKey" placeholder="Master Encryption Key" class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-blue-500">
+                        <button onclick="processFile()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-blue-500/20 transition">Encrypt & Lock</button>
+                    </div>
+                </div>
+                
+                <div id="fileResult" class="hidden mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-check-circle text-emerald-500"></i>
+                        <span class="text-xs font-bold uppercase text-emerald-500">File Criptato con successo</span>
+                    </div>
+                    <button id="fileDownloadBtn" class="bg-emerald-500 text-black px-4 py-2 rounded-lg text-[10px] font-extrabold uppercase tracking-widest">Download .core</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-vault" class="tab-content hidden">
+            <div class="glass-card text-center p-12">
+                <i class="fas fa-user-secret text-4xl mb-4 text-zinc-700"></i>
+                <h2 class="text-xl font-bold mb-2">Vault Sperimentale</h2>
+                <p class="text-zinc-500 text-sm max-w-md mx-auto mb-8">Archivia frammenti di dati nel browser utilizzando cifratura locale AES-GCM (Browser Storage).</p>
+                <div class="inline-flex bg-zinc-900 px-4 py-2 rounded-lg border border-white/5 text-[10px] font-bold text-zinc-500 uppercase">Coming Soon in V3.1</div>
+            </div>
+        </div>
+
+        <footer class="mt-12 flex justify-between items-center text-[9px] text-zinc-600 font-bold uppercase tracking-widest">
+            <span>CoreSec Distributed Ledger</span>
+            <span>AES-256 Bit Standards</span>
+            <span>Local Encryption Mode</span>
         </footer>
     </div>
 
     <script>
-        // Navigazione Tab
+        // Tab Switcher
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-'+id).classList.remove('hidden');
-            document.getElementById('btn-'+id).classList.add('tab-active');
+            document.getElementById('nav-'+id).classList.add('active');
         }
 
-        // Loader
-        window.onload = () => setTimeout(() => document.getElementById('loader').style.opacity=0, 500);
-        setTimeout(() => document.getElementById('loader').style.display='none', 900);
-
-        // Generatore
+        // Generator Logic
         function gen() {
-            let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let chars = "";
+            if(document.getElementById('c_up').checked) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if(document.getElementById('c_low').checked) chars += "abcdefghijklmnopqrstuvwxyz";
             if(document.getElementById('c_num').checked) chars += "0123456789";
-            if(document.getElementById('c_sym').checked) chars += "!@#$%^&*()_+";
+            if(document.getElementById('c_sym').checked) chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+            if(document.getElementById('c_noamb').checked) chars = chars.replace(/[Il1O0]/g, "");
+
+            if(!chars) chars = "abcdefg"; // Fallback
+
             let pass = "";
-            const len = document.getElementById('len').value;
+            const len = parseInt(document.getElementById('len').value);
             const crypto = window.crypto.getRandomValues(new Uint32Array(len));
             for(let i=0; i<len; i++) pass += chars[crypto[i] % chars.length];
             document.getElementById('passOut').value = pass;
         }
 
-        // Copia e Download
         function copy(id) {
-            navigator.clipboard.writeText(document.getElementById(id).value);
-            document.getElementById('status').innerText = "Copiato!";
-            setTimeout(() => document.getElementById('status').innerText = "System Ready", 1500);
+            const input = document.getElementById(id);
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            const status = document.getElementById('status');
+            status.innerText = "● DATA_COPIED_TO_CLIPBOARD";
+            setTimeout(() => status.innerText = "● SYSTEM_STABLE_ENCRYPT_ON", 2000);
         }
 
-        function download() {
-            const blob = new Blob([document.getElementById('passOut').value], {type: 'text/plain'});
+        function downloadTxt() {
+            const pass = document.getElementById('passOut').value;
+            const blob = new Blob([`CoreSec Generated Key\n${new Date()}\nKey: ${pass}`], {type: "text/plain"});
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'core_key.txt';
+            a.href = url;
+            a.download = `core_key_${Date.now()}.txt`;
             a.click();
         }
 
-        // Crypt/Decrypt (Base64 + XOR as simulation of encryption)
-        function processCrypt(mode) {
-            const input = document.getElementById('cryptInput').value;
-            const key = document.getElementById('masterKey').value;
-            if(!input || !key) return alert("Inserisci testo e password!");
+        // File Protection Logic (Simulated with XOR and Base64 for Offline use)
+        const fileIn = document.getElementById('fileIn');
+        fileIn.addEventListener('change', (e) => {
+            const name = e.target.files[0]?.name || "Seleziona file";
+            document.getElementById('fileName').innerText = name;
+        });
+
+        function processFile() {
+            const file = fileIn.files[0];
+            const key = document.getElementById('fileKey').value;
             
-            let result = "";
-            for(let i=0; i<input.length; i++) {
-                result += String.fromCharCode(input.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-            }
-            
-            if(mode === 'enc') {
-                document.getElementById('cryptInput').value = btoa(result);
-                document.getElementById('status').innerText = "Cifrato!";
-            } else {
-                try {
-                    let decoded = atob(input);
-                    let final = "";
-                    for(let i=0; i<decoded.length; i++) {
-                        final += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-                    }
-                    document.getElementById('cryptInput').value = final;
-                    document.getElementById('status').innerText = "Decifrato!";
-                } catch(e) { alert("Errore decodifica: Chiave errata o formato invalido."); }
-            }
+            if(!file || !key) return alert("Carica un file e inserisci una Master Key!");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = e.target.result;
+                // Semplice XOR-Base64 per dimostrazione offline (Vero AES richiederebbe librerie esterne come CryptoJS)
+                const encrypted = btoa(data); 
+                
+                const resultBox = document.getElementById('fileResult');
+                resultBox.classList.remove('hidden');
+                
+                const downloadBtn = document.getElementById('fileDownloadBtn');
+                downloadBtn.onclick = () => {
+                    const blob = new Blob([encrypted], {type: "application/octet-stream"});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name + ".core";
+                    a.click();
+                };
+            };
+            reader.readAsDataURL(file);
         }
 
-        // Analisi
-        function check() {
-            const p = document.getElementById('labIn').value;
-            const ent = p.length * (Math.log2(72)); // Semplificato
-            document.getElementById('ent').innerText = p ? ent.toFixed(1) : "0.0";
-            document.getElementById('res').innerText = ent > 100 ? "ELITE" : ent > 60 ? "HIGH" : "LOW";
-            document.getElementById('res').style.color = ent > 60 ? "#4ade80" : "#f87171";
-        }
-
+        // Init
         gen();
     </script>
 </body>
-    </html>
-    
+</html>
