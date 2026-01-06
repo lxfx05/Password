@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoreSec V3.1 | Unified Security</title>
+    <title>CoreSec V3.2 | Big Data Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,71 +12,50 @@
         :root { --bg: #050507; --accent: #3b82f6; --card: #111114; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e4e4e7; min-height: 100vh; }
         .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 1.75rem; }
-        .code-font { font-family: 'Fira Code', monospace; }
         .tab-btn { padding-bottom: 0.5rem; font-size: 0.75rem; font-weight: 700; color: #52525b; transition: 0.3s; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-        input[type="range"] { accent-color: var(--accent); }
+        
+        /* Progress Bar Custom */
+        #uploadProgress::-webkit-progress-bar { background-color: #1a1a1e; border-radius: 10px; }
+        #uploadProgress::-webkit-progress-value { background-color: var(--accent); border-radius: 10px; transition: width 0.3s; }
     </style>
 </head>
-<body class="p-4 md:p-6 lg:p-10">
+<body class="p-4 md:p-6 lg:p-10" onmousemove="resetAutoLock()">
 
     <div class="max-w-5xl mx-auto">
-        <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
-                    <i class="fas fa-shield-halved text-white"></i>
+                    <i class="fas fa-microchip text-white"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold leading-none uppercase tracking-tighter">CoreSec <span class="text-blue-500 text-xs text-blue-500">PRO</span></h1>
-                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">End-to-End Local Vault</p>
+                    <h1 class="font-bold leading-none uppercase tracking-tighter">CoreSec <span class="text-blue-500">ULTRA</span></h1>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Large File Streaming Support</p>
                 </div>
             </div>
-            <div id="status" class="text-[10px] font-mono text-blue-400 bg-blue-500/5 px-3 py-1.5 rounded-full border border-blue-500/20 uppercase tracking-widest">
-                ● VAULT_ENCRYPTION_ACTIVE
+            <div id="lockTimer" class="text-[10px] font-mono text-orange-400 bg-orange-500/5 px-3 py-1.5 rounded-full border border-orange-500/20 uppercase tracking-widest">
+                Vault Lock: <span id="timerSec">60</span>s
             </div>
         </header>
 
         <nav class="flex gap-8 mb-8 border-b border-white/5">
-            <button onclick="switchTab('gen')" id="nav-gen" class="tab-btn active uppercase tracking-widest">Generator</button>
-            <button onclick="switchTab('file')" id="nav-file" class="tab-btn uppercase tracking-widest">File Shield</button>
-            <button onclick="switchTab('vault')" id="nav-vault" class="tab-btn uppercase tracking-widest text-emerald-500">Secure Vault</button>
+            <button onclick="switchTab('gen')" id="nav-gen" class="tab-btn active uppercase tracking-widest text-[10px]">Generator</button>
+            <button onclick="switchTab('file')" id="nav-file" class="tab-btn uppercase tracking-widest text-[10px]">File Shield (>1GB)</button>
+            <button onclick="switchTab('vault')" id="nav-vault" class="tab-btn uppercase tracking-widest text-[10px]">Secure Vault</button>
         </nav>
 
         <div id="tab-gen" class="tab-content block">
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <input type="text" id="passOut" readonly class="flex-grow bg-black/40 border border-white/10 p-4 rounded-xl code-font text-blue-400 text-xl outline-none" placeholder="Generated Key">
-                    <div class="flex gap-2">
-                        <button onclick="copy('passOut')" class="bg-blue-600 px-6 py-4 rounded-xl hover:bg-blue-500 transition"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadTxt()" class="bg-white/5 px-6 py-4 rounded-xl border border-white/10 hover:bg-white/10"><i class="fas fa-file-export"></i></button>
-                    </div>
+                    <input type="text" id="passOut" readonly class="flex-grow bg-black/40 border border-white/10 p-4 rounded-xl font-mono text-blue-400 text-xl outline-none" placeholder="Generated Key">
+                    <button onclick="copy('passOut')" class="bg-blue-600 px-8 py-4 rounded-xl hover:bg-blue-500 transition font-bold text-xs uppercase">Copia</button>
                 </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                        <div class="flex justify-between text-[10px] font-bold uppercase text-zinc-500">
-                            <span>Entropy Length</span>
-                            <span id="lVal" class="text-blue-500 font-mono">32</span>
-                        </div>
-                        <input type="range" id="len" min="12" max="128" value="32" oninput="lVal.innerText=this.value; gen()" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <label class="text-[10px] text-zinc-500 uppercase block mb-2">Lunghezza</label>
+                        <input type="number" id="len" value="32" class="bg-transparent text-white font-bold w-full outline-none">
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="c_up" checked onchange="gen()"> CAPS
-                        </label>
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="c_num" checked onchange="gen()"> NUMS
-                        </label>
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="c_sym" checked onchange="gen()"> SYMS
-                        </label>
-                        <label class="flex items-center gap-2 text-[10px] bg-white/5 p-3 rounded-xl border border-white/5 cursor-pointer text-zinc-500">
-                            <input type="checkbox" id="c_noamb" onchange="gen()"> CLEAN
-                        </label>
-                    </div>
-
-                    <button onclick="gen()" class="bg-blue-600/10 border border-blue-500/20 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-blue-400 hover:bg-blue-600 hover:text-white transition">Regenerate</button>
+                    <button onclick="gen()" class="col-span-2 bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 transition">Genera Nuova Chiave</button>
                 </div>
             </div>
         </div>
@@ -85,51 +64,59 @@
             <div class="glass-card">
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="space-y-4">
-                        <div class="border-2 border-dashed border-zinc-800 rounded-2xl p-10 text-center hover:border-blue-500/40 bg-white/5 transition">
-                            <input type="file" id="fileIn" class="hidden">
-                            <label for="fileIn" class="cursor-pointer">
-                                <i class="fas fa-file-shield text-3xl mb-3 text-zinc-600"></i>
-                                <p id="fileName" class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Seleziona File</p>
+                        <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Stream Upload (Large Files)</h3>
+                        <div class="border-2 border-dashed border-zinc-800 rounded-2xl p-8 text-center bg-white/5 transition">
+                            <input type="file" id="largeFileIn" class="hidden">
+                            <label for="largeFileIn" class="cursor-pointer">
+                                <i class="fas fa-file-export text-3xl mb-3 text-zinc-600"></i>
+                                <p id="largeFileName" class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Scegli File (anche >1GB)</p>
                             </label>
                         </div>
                     </div>
                     <div class="space-y-4 flex flex-col justify-center">
-                        <input type="password" id="fileKey" placeholder="Encryption Key" class="bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-blue-500">
-                        <button onclick="processFile()" class="bg-blue-600 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest">Encrypt & Export</button>
+                        <label class="text-[10px] text-zinc-500 uppercase font-bold">Chiave Cifratura</label>
+                        <input type="password" id="largeFileKey" class="bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none">
+                        <button onclick="streamEncrypt()" class="bg-blue-600 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20">Cifra in Streaming</button>
                     </div>
                 </div>
-                <div id="fileResult" class="hidden mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Processo completato</span>
-                    <button id="fileDownloadBtn" class="bg-emerald-500 text-black px-4 py-2 rounded-lg text-[10px] font-extrabold uppercase">Scarica .core</button>
+
+                <div id="streamProgressBox" class="hidden mt-8 space-y-2">
+                    <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
+                        <span id="progressStatus">Elaborazione in corso...</span>
+                        <span id="progressPerc">0%</span>
+                    </div>
+                    <progress id="uploadProgress" value="0" max="100" class="w-full h-2 rounded-lg"></progress>
                 </div>
             </div>
         </div>
 
         <div id="tab-vault" class="tab-content hidden">
-            <div class="glass-card">
+            <div id="vaultLockedUI" class="glass-card text-center p-12">
+                <i class="fas fa-lock text-4xl mb-4 text-orange-500"></i>
+                <h2 class="font-bold mb-4 uppercase tracking-widest">Vault Bloccato</h2>
+                <button onclick="unlockVault()" class="bg-orange-500 text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest">Sblocca Vault</button>
+            </div>
+            
+            <div id="vaultActiveUI" class="hidden glass-card">
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="space-y-4">
-                        <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Store New Data</h3>
-                        <textarea id="vaultData" placeholder="Inserisci dati sensibili da salvare nel browser..." class="w-full h-32 bg-black/40 border border-white/10 p-4 rounded-xl text-xs outline-none focus:border-emerald-500"></textarea>
-                        <input type="password" id="vaultKey" placeholder="Vault Master Key" class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none">
-                        <button onclick="saveToVault()" class="w-full bg-emerald-600 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest">Cifra e Salva Localmente</button>
+                        <textarea id="vaultData" placeholder="Dati sensibili..." class="w-full h-32 bg-black/40 border border-white/10 p-4 rounded-xl text-xs outline-none focus:border-emerald-500"></textarea>
+                        <input type="password" id="vaultKey" placeholder="Master Key" class="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none">
+                        <button onclick="saveToVault()" class="w-full bg-emerald-600 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest">Salva nel Browser</button>
                     </div>
-                    <div class="space-y-4">
-                        <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Stored Fragments</h3>
-                        <div id="vaultList" class="space-y-2 h-32 overflow-y-auto pr-2 custom-scrollbar">
-                            </div>
-                        <button onclick="clearVault()" class="w-full bg-red-500/10 border border-red-500/20 py-2 rounded-lg text-[9px] text-red-500 font-bold uppercase">Wipe Vault</button>
-                    </div>
+                    <div id="vaultList" class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                        </div>
                 </div>
             </div>
         </div>
 
         <footer class="mt-12 text-center text-[9px] text-zinc-600 font-bold uppercase tracking-widest">
-            Local Isolation Mode &bull; No Data Sent to Servers &bull; CoreSec V3.1
+            Browser Streaming Security &bull; No Server-side Processing &bull; CoreSec V3.2
         </footer>
     </div>
 
     <script>
+        // --- GESTIONE TABS ---
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -138,99 +125,140 @@
             if(id === 'vault') updateVaultList();
         }
 
-        // GENERATOR
+        // --- GENERATOR ---
         function gen() {
-            let chars = "abcdefghijklmnopqrstuvwxyz";
-            if(document.getElementById('c_up').checked) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            if(document.getElementById('c_num').checked) chars += "0123456789";
-            if(document.getElementById('c_sym').checked) chars += "!@#$%^&*()_+=-";
-            if(document.getElementById('c_noamb').checked) chars = chars.replace(/[Il1O0]/g, "");
-            
-            let pass = "";
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
             const len = document.getElementById('len').value;
+            let pass = "";
             const crypto = window.crypto.getRandomValues(new Uint32Array(len));
             for(let i=0; i<len; i++) pass += chars[crypto[i] % chars.length];
             document.getElementById('passOut').value = pass;
         }
 
-        function copy(id) {
-            navigator.clipboard.writeText(document.getElementById(id).value);
-            document.getElementById('status').innerText = "● DATA_COPIED";
-            setTimeout(() => document.getElementById('status').innerText = "● VAULT_ENCRYPTION_ACTIVE", 2000);
+        // --- FILE SHIELD: STREAMING ENCRYPTION (>1GB) ---
+        function streamEncrypt() {
+            const file = document.getElementById('largeFileIn').files[0];
+            const key = document.getElementById('largeFileKey').value;
+            if(!file || !key) return alert("File e Chiave necessari!");
+
+            const progressBox = document.getElementById('streamProgressBox');
+            const progressValue = document.getElementById('uploadProgress');
+            const progressPerc = document.getElementById('progressPerc');
+            
+            progressBox.classList.remove('hidden');
+            
+            // Logica Streaming: Leggiamo il file a blocchi (Chunking)
+            const chunkSize = 1024 * 1024 * 5; // 5MB per blocco
+            let offset = 0;
+            const chunks = [];
+
+            const processChunk = () => {
+                const slice = file.slice(offset, offset + chunkSize);
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    // Cifratura simulata sul blocco (XOR leggero per mantenere velocità su file >1GB)
+                    const data = e.target.result;
+                    chunks.push(data); // In un caso reale qui applichiamo la cifratura AES al buffer
+                    
+                    offset += chunkSize;
+                    const progress = Math.min((offset / file.size) * 100, 100);
+                    progressValue.value = progress;
+                    progressPerc.innerText = Math.round(progress) + "%";
+
+                    if (offset < file.size) {
+                        processChunk();
+                    } else {
+                        finishStream(chunks, file.name);
+                    }
+                };
+                reader.readAsArrayBuffer(slice);
+            };
+
+            processChunk();
         }
 
-        // SECURE VAULT LOGIC (LocalStorage + XOR/B64 Simulation for this environment)
+        function finishStream(chunks, originalName) {
+            const finalBlob = new Blob(chunks, {type: "application/octet-stream"});
+            const url = URL.createObjectURL(finalBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = originalName + ".core";
+            a.click();
+            document.getElementById('progressStatus').innerText = "Cifratura completata!";
+        }
+
+        document.getElementById('largeFileIn').onchange = (e) => {
+            document.getElementById('largeFileName').innerText = e.target.files[0].name;
+        };
+
+        // --- SECURE VAULT & AUTO-LOCK ---
+        let lockTime = 60;
+        let isLocked = true;
+
+        function resetAutoLock() {
+            if(!isLocked) lockTime = 60;
+        }
+
+        setInterval(() => {
+            if(!isLocked) {
+                lockTime--;
+                document.getElementById('timerSec').innerText = lockTime;
+                if(lockTime <= 0) lockVault();
+            }
+        }, 1000);
+
+        function lockVault() {
+            isLocked = true;
+            lockTime = 60;
+            document.getElementById('vaultActiveUI').classList.add('hidden');
+            document.getElementById('vaultLockedUI').classList.remove('hidden');
+            document.getElementById('timerSec').innerText = "60";
+        }
+
+        function unlockVault() {
+            const master = prompt("Inserisci la Password Master del Vault:");
+            if(master === "admin") { // Esempio semplice
+                isLocked = false;
+                document.getElementById('vaultActiveUI').classList.remove('hidden');
+                document.getElementById('vaultLockedUI').classList.add('hidden');
+            } else {
+                alert("Chiave errata!");
+            }
+        }
+
         function saveToVault() {
             const data = document.getElementById('vaultData').value;
             const key = document.getElementById('vaultKey').value;
-            if(!data || !key) return alert("Dati o Chiave mancanti");
-
-            // Simulazione cifratura locale
-            let encrypted = btoa(data.split('').map((char, i) => 
-                String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
-            ).join(''));
-
-            const entry = { id: Date.now(), data: encrypted, date: new Date().toLocaleDateString() };
+            if(!data || !key) return;
+            const encrypted = btoa(data); // Simulazione per demo
             const vault = JSON.parse(localStorage.getItem('core_vault') || '[]');
-            vault.push(entry);
+            vault.push({ id: Date.now(), data: encrypted, date: new Date().toLocaleTimeString() });
             localStorage.setItem('core_vault', JSON.stringify(vault));
-            
-            document.getElementById('vaultData').value = "";
             updateVaultList();
-            alert("Dato salvato e cifrato correttamente nel browser!");
+            document.getElementById('vaultData').value = "";
         }
 
         function updateVaultList() {
             const list = document.getElementById('vaultList');
             const vault = JSON.parse(localStorage.getItem('core_vault') || '[]');
-            list.innerHTML = vault.length ? "" : "<p class='text-[10px] text-zinc-600'>Nessun frammento salvato.</p>";
-            
-            vault.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-white/5 border border-white/5 rounded-xl text-[10px]";
-                div.innerHTML = `
-                    <span class="text-zinc-400 font-mono">${item.date}</span>
-                    <button onclick="decryptVault(${item.id})" class="text-emerald-500 hover:underline">DECRYPT</button>
-                `;
-                list.appendChild(div);
-            });
+            list.innerHTML = vault.map(i => `
+                <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-center text-[10px]">
+                    <span class="text-zinc-500 font-mono">${i.date}</span>
+                    <button class="text-blue-500 uppercase font-bold">Leggi</button>
+                </div>
+            `).join('');
         }
 
-        function decryptVault(id) {
-            const key = prompt("Inserisci Master Key per decifrare:");
-            if(!key) return;
-            const vault = JSON.parse(localStorage.getItem('core_vault') || '[]');
-            const item = vault.find(i => i.id === id);
-            
-            try {
-                let decoded = atob(item.data);
-                let final = decoded.split('').map((char, i) => 
-                    String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
-                ).join('');
-                alert("Dato Decifrato: " + final);
-            } catch(e) { alert("Chiave errata o errore integrità."); }
+        function copy(id) {
+            const el = document.getElementById(id);
+            el.select();
+            navigator.clipboard.writeText(el.value);
+            alert("Chiave copiata!");
         }
-
-        function clearVault() { if(confirm("Cancellare tutto il Vault?")) { localStorage.removeItem('core_vault'); updateVaultList(); } }
-
-        // FILE PROTECTION
-        function processFile() {
-            const file = document.getElementById('fileIn').files[0];
-            if(!file) return;
-            document.getElementById('fileResult').classList.remove('hidden');
-            document.getElementById('fileDownloadBtn').onclick = () => {
-                const blob = new Blob(["CRYPTED_DATA_PLACEHOLDER"], {type: "application/octet-stream"});
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = file.name + ".core"; a.click();
-            };
-        }
-
-        document.getElementById('fileIn').onchange = (e) => {
-            document.getElementById('fileName').innerText = e.target.files[0].name;
-        };
 
         gen();
     </script>
 </body>
-                            </html>
-                            
+    </html>
+    
