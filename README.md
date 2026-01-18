@@ -14,7 +14,7 @@ This project is inspired by the precision of **Russian and Chinese logic**, appl
 ## 🚀 Roadmap
 * **Supabase Integration:** Implementing encrypted cloud storage for configurations. 📊
 * **API Layer:** Programmatic access for external security audits.
-* **UI Refinement:** Aesthetics inspired by Mercedes-level comfort and BMW-level power. 🚗
+* **UI Refinement:** Focus on minimalist design and maximum efficiency.
 
 ## 💻 Development Setup
 If you are using **Fish Shell** on Termux, clone and navigate:
