@@ -55,4 +55,4 @@ Contributions and feedback are always welcome to make the web a safer place.
 </div>
 
 ---
-*Developed with focus by [Luca Finaldi](https://lxfx05.github.io/Website/)* 🏳️‍🌈
+*Developed with focus by [Luca Finaldi](https://lxfx05.github.io/Website/)* 
